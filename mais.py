@@ -1,6 +1,20 @@
 from flask import Flask, render_template, request
+import sqlite3
 
 app = Flask(__name__, template_folder='templates')
+
+
+class first_database():
+    def __init__(self, file_name):
+        self.con = sqlite3.connect(file_name)
+        self.cur = self.con.cursor()
+
+    def __enter__(self):
+        return self.cur
+
+    def __exit__(self, type, value, traceback):
+        self.con.commit()
+        self.con.close()
 
 
 @app.route("/")
@@ -21,6 +35,10 @@ def register():
     if request.method == 'GET':
         return render_template('registration.html')
     if request.method == 'POST':
+        with first_database('db.1') as db_cur:
+            form_data = request.form
+            db_cur.execute(
+                'INSERT INTO user (login,passwor,ipn, ful_name, contacts, photo, passport) VALUES ()')
         return 'POST'
 
 

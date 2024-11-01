@@ -1,27 +1,100 @@
 <!DOCTYPE html>
-<html lang="it">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Registrazione</title>
+    <title>Registration Form</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .container {
+            max-width: 400px;
+            background-color: #fff;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 5px;
+        }
+        .container h2 {
+            text-align: center;
+            color: #333;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #333;
+        }
+        .form-group input[type="text"],
+        .form-group input[type="password"],
+        .form-group input[type="email"],
+        .form-group input[type="url"] {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+            box-sizing: border-box;
+        }
+        .form-group button {
+            width: 100%;
+            padding: 10px;
+            background-color: #28a745;
+            color: #fff;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+        .form-group button:hover {
+            background-color: #218838;
+        }
+    </style>
 </head>
 <body>
-    <h1>Registrazione</h1>
-    <form action="/register" method="post">
-        <label for="username">Username:</label>
-        <input type="text" id="username" name="username" required>
-        <br>
-        <label for="email">Email:</label>
-        <input type="email" id="email" name="email" required>
-        <br>
-        <label for="password">Password:</label>
-        <input type="password" id="password" name="password" required>
-        <br>
-        <label for="confirm-password">Conferma Password:</label>
-        <input type="password" id="confirm-password" name="confirm-password" required>
-        <br>
-        <button type="submit">Registrati</button>
+
+<div class="container">
+    <h2>Registration Form</h2>
+            <div class="form-group">
+            <label for="login">Login:</label>
+            <input type="text" id="login" name="login" required>
+        </div>
+        <div class="form-group">
+            <label for="password">Password:</label>
+            <input type="password" id="password" name="password" required>
+        </div>
+        <div class="form-group">
+            <label for="ipn">IPN (Individual Personal Number):</label>
+            <input type="number" id="ipn" name="ipn" required>
+        </div>
+        <div class="form-group">
+            <label for="full_name">Full Name:</label>
+            <input type="text" id="full_name" name="full_name" required>
+        </div>
+        <div class="form-group">
+            <label for="contacts">Contacts (Email or Phone):</label>
+            <input type="email" id="contacts" name="contacts" required>
+        </div>
+        <div class="form-group">
+            <label for="photo">Photo URL:</label>
+            <input type="url" id="photo" name="photo" placeholder="https://example.com/photo.jpg" required>
+        </div>
+        <div class="form-group">
+            <label for="passport">Passport Number:</label>
+            <input type="text" id="passport" name="passport" required>
+        </div>
+        <div class="form-group">
+            <button type="submit">Register</button>
+        </div>
     </form>
-    <p>Hai già un account? <a href="login.html">Accedi qui</a></p>
+</div>
+
 </body>
 </html>
+  
