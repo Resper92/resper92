@@ -4,9 +4,16 @@ import sqlite3
 app = Flask(__name__, template_folder='templates')
 
 
+def dict_factory(cursor, row):
+    d = {}
+    for idx, col in enumerate(cursor.description):
+        d[col[0]] = row[idx]
+    return d
+
 class first_database():
     def __init__(self, file_name):
         self.con = sqlite3.connect(file_name)
+        self.con.row_factory = dict_factory
         self.cur = self.con.cursor()
 
     def __enter__(self):
@@ -54,8 +61,8 @@ def logout():
 
 @app.route('/profile', methods=['GET', 'PUT', 'PATCH', 'DELETE'])
 def profile():
-    if request.method == 'POST':
-        return 'POST'
+    if request.method == 'GET':
+        return render_template('profile.html')
     if request.method == 'PUT':
         return 'PUT'
     if request.method == 'PATCH':
@@ -84,23 +91,35 @@ def del_fav(favourite_id):
         return 'DELETE'
 
 
-@app.route('/profile/history', methods=['GET', 'DELETE'])
+@app.route('/profile', methods=['GET', 'DELETE'])
 def prof_hist():
     if request.method == 'GET':
-        return 'GET'
+        with first_database('db1.db') as db_cur:
+            db_cur.execute('SELECT * FROM search_history')
+            history = db_cur.fetchall()
+            return render_template('profile.html', history == history)
+
     if request.method == 'DELETE':
         return 'DELETE'
 
 
-@app.route('/items', methods=['GET', 'POST'])
+@app.route('/item', methods=['GET', 'POST'])
 def items():
     if request.method == 'GET':
-        return 'GET'
+        with first_database('db1.db') as db_cur:
+            db_cur.execute('SELECT * FROM item')
+            item = db_cur.fetchall()
+            return render_template('item.html', item=item)
+
     if request.method == 'POST':
-        return 'POST'
+       with first_database('db1.db') as db_cur:
+           form_data = request.form
+           db_cur.execute('''INSERT INTO item (name, photo, description, price_hour, price_day, price_week, price_month) VALUES (:name, :photo, :description, :price_hour, :price_day, :price_week, :price_month)''', request.form)
+
+           return redirect('/item')
 
 
-@app.route('/items/<item_id>', methods=['GET', 'DELETE'])
+@ app.route('/item/<item_id>', methods=['GET', 'DELETE'])
 def item(item_id):
     if request.method == 'GET':
         return 'GET'

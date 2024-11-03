@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Item Details</title>
+</head>
+<body>
+    <p>Item count: {{ item|length }}</p>
+    {% for one_item in item %}
+        <div>
+            <h2>{{ one_item.name }}</h2>
+            <p><strong>Photo URL:</strong> {{ one_item.photo }}</p>
+            <p><strong>Description:</strong> {{ one_item.description }}</p>
+            <h3>Pricing</h3>
+            <ul>
+                <li>Price per hour: ${{ one_item.price_hour }}</li>
+                <li>Price per day: ${{ one_item.price_day }}</li>
+                <li>Price per week: ${{ one_item.price_week }}</li>
+                <li>Price per month: ${{ one_item.price_month }}</li>
+            </ul>
+            <hr>
+        </div>
+    {% endfor %}
+</body>
+
+</html>

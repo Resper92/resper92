@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Profile</title>
+    <style>
+        #itemForm, #historyTable {
+            display: none; /* Nasconde il form e la tabella inizialmente */
+        }
+        table, th, td {
+            border: 1px solid black;
+            border-collapse: collapse;
+            padding: 8px;
+        }
+    </style>
+    <script>
+        function showForm() {
+            document.getElementById('itemForm').style.display = 'block';
+            document.getElementById('showButton').style.display = 'none';
+        }
+
+        function toggleTable() {
+            const table = document.getElementById('historyTable');
+            const toggleButton = document.getElementById('toggleButton');
+            if (table.style.display === 'none') {
+                table.style.display = 'table';
+                toggleButton.textContent = 'Hide Search History';
+            } else {
+                table.style.display = 'none';
+                toggleButton.textContent = 'Show Search History';
+            }
+        }
+    </script>
+</head>
+<body>
+
+    <h1>Add Item</h1>
+    <button id="showButton" onclick="showForm()">Add Item</button>
+
+    <form id="itemForm" action="/item" method="post">
+        Name: <br>
+        <input type="text" name="name"><br>
+        Photo-url:<br>
+        <input type="text" name="photo"><br>
+        Description: <br>
+        <input type="text" name="description"><br>
+        Price-hour: <br>
+        <input type="text" name="price_hour"><br>
+        Price-day:<br>
+        <input type="text" name="price_day"><br>
+        Price-week: <br>
+        <input type="text" name="price_week"><br>
+        Price-month: <br>
+        <input type="text" name="price_month"><br>
+
+        <input type="submit" value="Send">
+    </form>
+
+    <h2>Navigation History</h2>
+    <button id="toggleButton" onclick="toggleTable()">Show Search History</button>
+    <table id="historyTable">
+        {% if history %}
+            <tr>
+                <th>Search</th>
+                <th>Timestamp</th>
+            </tr>
+            {% for one_history in history %}
+            <tr>
+                <td>{{ one_history.search_text }}</td> <!-- Colonna per 'search_text' -->
+                <td>{{ one_history.timestam }}</td> <!-- Colonna per 'timestamp' -->
+            </tr>
+            {% endfor %}
+        {% else %}
+            <tr>
+                <td colspan="2">No search history available.</td>
+            </tr>
+        {% endif %}
+    </table>
+
+</body>
+</html>
