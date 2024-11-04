@@ -23,7 +23,7 @@
         function toggleTable() {
             const table = document.getElementById('historyTable');
             const toggleButton = document.getElementById('toggleButton');
-            if (table.style.display === 'none') {
+            if (table.style.display === 'none' || table.style.display === '') {
                 table.style.display = 'table';
                 toggleButton.textContent = 'Hide Search History';
             } else {
@@ -40,25 +40,26 @@
 
     <form id="itemForm" action="/item" method="post">
         Name: <br>
-        <input type="text" name="name"><br>
-        Photo-url:<br>
-        <input type="text" name="photo"><br>
+        <input type="text" name="name" required><br>
+        Photo URL:<br>
+        <input type="text" name="photo" required><br>
         Description: <br>
-        <input type="text" name="description"><br>
-        Price-hour: <br>
-        <input type="text" name="price_hour"><br>
-        Price-day:<br>
-        <input type="text" name="price_day"><br>
-        Price-week: <br>
-        <input type="text" name="price_week"><br>
-        Price-month: <br>
-        <input type="text" name="price_month"><br>
+        <input type="text" name="description" required><br>
+        Price per hour: <br>
+        <input type="number" name="price_hour" step="0.01" required><br>
+        Price per day:<br>
+        <input type="number" name="price_day" step="0.01" required><br>
+        Price per week: <br>
+        <input type="number" name="price_week" step="0.01" required><br>
+        Price per month: <br>
+        <input type="number" name="price_month" step="0.01" required><br>
 
         <input type="submit" value="Send">
     </form>
 
     <h2>Navigation History</h2>
     <button id="toggleButton" onclick="toggleTable()">Show Search History</button>
+    <form id="history" action="/profile/history" method="get"></form>
     <table id="historyTable">
         {% if history %}
             <tr>
@@ -67,8 +68,8 @@
             </tr>
             {% for one_history in history %}
             <tr>
-                <td>{{ one_history.search_text }}</td> <!-- Colonna per 'search_text' -->
-                <td>{{ one_history.timestam }}</td> <!-- Colonna per 'timestamp' -->
+                <td>{{ search_text }}</td> <!-- Colonna per 'search_text' -->
+                <td>{{ timestamp }}</td> <!-- Colonna per 'timestamp' -->
             </tr>
             {% endfor %}
         {% else %}

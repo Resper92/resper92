@@ -91,13 +91,14 @@ def del_fav(favourite_id):
         return 'DELETE'
 
 
-@app.route('/profile', methods=['GET', 'DELETE'])
+@app.route('/profile/history', methods=['GET', 'DELETE'])
 def prof_hist():
     if request.method == 'GET':
-        with first_database('db1.db') as db_cur:
-            db_cur.execute('SELECT * FROM search_history')
-            history = db_cur.fetchall()
-            return render_template('profile.html', history == history)
+        with first_database('db1.db') as db_c:
+            db_c.execute('SELECT * FROM search_history')
+            history = db_c.fetchall()
+            print(history)
+            return render_template('profile.html', history=history)
 
     if request.method == 'DELETE':
         return 'DELETE'
