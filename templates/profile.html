@@ -57,27 +57,33 @@
         <input type="submit" value="Send">
     </form>
 
-    <h2>Navigation History</h2>
-    <button id="toggleButton" onclick="toggleTable()">Show Search History</button>
-    <form id="history" action="/profile/history" method="get"></form>
-    <table id="historyTable">
-        {% if history %}
-            <tr>
-                <th>Search</th>
-                <th>Timestamp</th>
-            </tr>
-            {% for one_history in history %}
-            <tr>
-                <td>{{ search_text }}</td> <!-- Colonna per 'search_text' -->
-                <td>{{ timestamp }}</td> <!-- Colonna per 'timestamp' -->
-            </tr>
-            {% endfor %}
-        {% else %}
-            <tr>
-                <td colspan="2">No search history available.</td>
-            </tr>
-        {% endif %}
-    </table>
+<form id="history" action="/prof-hist" method="get">
+    <p>Hisory: {{ history|length }}</p>
+    {% for one_history in history %}
+        <div>
+            <ul>
+                <li>User: {{ one_history.user }}</li>
+                <li>Text: {{ one_history.serch_text}}</li>
+                <li>Timestamp: {{ one_history.timestamp }}</li>
+            </ul>
+            <hr>
+        </div>
+    {% endfor %}
+</form>
+
+<form id="complain" action="/complain" method="post">
+    Author: <br>
+    <input type="text" name="author" required><br>
+    User:<br>
+    <input type="text" name="user" required><br>
+    Grade: <br>
+    <input type="text" name="grade" required><br>
+    Contract: <br>
+    <input type="number" name="contract" step="0.01" required><br>
+    
+
+    <input type="submit" value="Send">
+</form>
 
 </body>
 </html>

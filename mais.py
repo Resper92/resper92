@@ -91,13 +91,12 @@ def del_fav(favourite_id):
         return 'DELETE'
 
 
-@app.route('/profile/history', methods=['GET', 'DELETE'])
+@app.route('/prof-hist', methods=['GET', 'DELETE'])
 def prof_hist():
     if request.method == 'GET':
-        with first_database('db1.db') as db_c:
-            db_c.execute('SELECT * FROM search_history')
-            history = db_c.fetchall()
-            print(history)
+        with first_database('db1.db') as db_cur:
+            db_cur.execute('SELECT * FROM search_history')
+            history = db_cur.fetchall()
             return render_template('profile.html', history=history)
 
     if request.method == 'DELETE':
@@ -123,7 +122,10 @@ def items():
 @ app.route('/item/<item_id>', methods=['GET', 'DELETE'])
 def item(item_id):
     if request.method == 'GET':
-        return 'GET'
+        with first_database('db1.db') as db_cur:
+            db_cur.execute('SELECT * FROM item')
+            item = db_cur.fetchone()
+            return render_template('item.html', item=item)
     if request.method == 'DELETE':
         return 'DELETE'
 
@@ -169,7 +171,11 @@ def search():
 @app.route('/complain', methods=['POST'])
 def complain():
     if request.method == 'POST':
-        return 'POST'
+        with first_database('db1.db') as db_cur:
+            form_data = request.form
+            db_cur.execute(
+                '''INSERT INTO feedback (author,user,grade,contract) VALUES(:author, :user, :grade, :contract)''', request.form)
+            return redirect('/')
 
 
 @app.route('/compare', methods=['GET', 'PUT', 'PATCH'])
