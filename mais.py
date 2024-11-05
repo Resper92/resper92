@@ -1,9 +1,18 @@
-from flask import Flask, render_template, request, redirect
+from flask import Flask, render_template, request, redirect, session
 import sqlite3
+from functools import wraps
 
 app = Flask(__name__, template_folder='templates')
+app.secret_key = 'asdasdasda12122'
 
 
+def login_required(f):
+    @wraps(f)
+    def wrapper(*args, **kwargs):
+        if 'user' not in session:
+            return redirect('/login')
+        return f(*args, **kwargs)
+    return wrapper
 def dict_factory(cursor, row):
     d = {}
     for idx, col in enumerate(cursor.description):
@@ -34,7 +43,19 @@ def login():
     if request.method == 'GET':
         return render_template('login.html')
     if request.method == 'POST':
-        return 'POST'
+        username = request.form['username']
+        password = request.form['password']
+
+        with first_database('db1.db') as db_cur:
+            db_cur.execute(
+                'SELECT * FROM user WHERE login = ? AND password = ?', (username, password))
+            user = db_cur.fetchone()
+            print(user)
+            if user:
+                session['user_id'] = user['login']
+                return redirect('/profile')
+            else:
+                return render_template('login.html', error='Invalid username or password')
 
 
 @app.route('/register', methods=['GET', 'POST'])
@@ -59,10 +80,15 @@ def logout():
         return 'DELETE'
 
 
+@login_required
 @app.route('/profile', methods=['GET', 'PUT', 'PATCH', 'DELETE'])
 def profile():
     if request.method == 'GET':
-        return render_template('profile.html')
+        with first_database('db1.db') as db_cur:
+           db_cur.execute('SELECT * FROM user WHERE login = ?',
+                          (session['user_id'],))
+           user = db_cur.fetchone()
+           return render_template('profile.html', user=user)
     if request.method == 'PUT':
         return 'PUT'
     if request.method == 'PATCH':
@@ -71,6 +97,7 @@ def profile():
         return 'DELETE'
 
 
+@login_required
 @app.route('/profile/favourites', methods=['GET', 'POST', 'PATCH', 'DELETE'])
 def profile_fav():
     if request.method == 'GET':
@@ -142,13 +169,20 @@ def leaser(leasers_id):
         return 'GET'
 
 
-@app.route('/contracts', methods=['GET', 'POST'])
+@login_required
+@app.route('/contract', methods=['GET', 'POST'])
 def contracts():
-    if request.methods == 'GET':
-        return 'GET'
-    if request.methods == 'POST':
-        return 'POST'
-
+    if request.method == 'GET':
+        with first_database('db1.db') as db_cur:
+            db_cur.execute('select * from contract')
+            contracts = db_cur.fetchall()
+            return render_template('contract.html', contracts=contracts)
+    if request.method == 'POST':
+        with first_database('db1.b') as db_cur:
+            form_data = request.form
+            db_cur.execute(
+                '''INSERT INTO contract (text,start_date,end_date,leaser,taker,item) values (:text,:start_date,:end_date,:leaser,:taker,:item)''', request.form)
+            return redirect('/')
 
 @app.route('/contract/<contracts_id>', methods=['GET', 'PATCH', 'PUT'])
 def contract(contracts_id):
