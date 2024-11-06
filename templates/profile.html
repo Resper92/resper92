@@ -34,22 +34,21 @@
     </script>
 </head>
 <body>
-    <form id="profile" action="/pofile" method="get">
-        <p>Profile count: {{ user|length }}</p>
+    <!-- Sezione Profilo -->
+    <h2>Profile</h2>
+    {% if user %}
         <ul>
-            {% for one_user in user %}
-                <li><strong>Name:</strong> {{ one_user.full_name }}</li>
-                <li><strong>Contact:</strong> {{ one_user.contacts }}</li>
-                <li><strong>IPN:</strong> {{ one_user.ipn }}</li>
-                <li><strong>Photo:</strong> 
-                    <img src="{{ one_user.photo }}" alt="User Photo" width="100"> <!-- Mostra l'immagine se l'URL è disponibile -->
-                </li>
-                <li><strong>Passport:</strong> {{ one_user.passport }}</li>
-                <hr>
-            {% endfor %}
+            <li><strong>Name:</strong> {{ user.full_name }}</li>
+            <li><strong>Contact:</strong> {{ user.contacts }}</li>
+            <li><strong>IPN:</strong> {{ user.ipn }}</li>
+            <li><strong>Photo:</strong> <img src="{{ user.photo }}" alt="User photo" style="width:150px;height:auto;"></li>
+            <li><strong>Passport:</strong> {{ user.passport }}</li>
         </ul>
-    </form>
+    {% else %}
+        <p>User not found.</p>
+    {% endif %}
 
+    <!-- Sezione Aggiunta Item -->
     <h1>Add Item</h1>
     <button id="showButton" onclick="showForm()">Add Item</button>
 
@@ -68,23 +67,33 @@
         <input type="number" name="price_week" step="0.01" required><br>
         Price per month: <br>
         <input type="number" name="price_month" step="0.01" required><br>
-
         <input type="submit" value="Send">
     </form>
 
-<form id="history" action="/prof-hist" method="get">
-    <p>Hisory: {{ history|length }}</p>
-    {% for one_history in history %}
-        <div>
-            <ul>
-                <li>User: {{ one_history.user }}</li>
-                <li>Text: {{ one_history.serch_text}}</li>
-                <li>Timestamp: {{ one_history.timestamp }}</li>
-            </ul>
-            <hr>
-        </div>
-    {% endfor %}
-</form>
+    <!-- Sezione Cronologia -->
+    <h2>Search History</h2>
+    <button id="toggleButton" onclick="toggleTable()">Show Search History</button>
 
+    <div id="historyTable">
+        <p>History Count: {{ history|length }}</p>
+        {% if history %}
+            <table>
+                <tr>
+                    <th>User</th>
+                    <th>Text</th>
+                    <th>Timestamp</th>
+                </tr>
+                {% for one_history in history %}
+                    <tr>
+                        <td>{{ one_history['user'] }}</td>
+                        <td>{{ one_history['search_text'] }}</td>
+                        <td>{{ one_history['timestamp'] }}</td>
+                    </tr>
+                {% endfor %}
+            </table>
+        {% else %}
+            <p>No search history available.</p>
+        {% endif %}
+    </div>
 </body>
 </html>

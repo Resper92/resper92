@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, session
+from flask import Flask, render_template, request, redirect, session, jsonify
 import sqlite3
 from functools import wraps
 
@@ -50,9 +50,8 @@ def login():
             db_cur.execute(
                 'SELECT * FROM user WHERE login = ? AND password = ?', (username, password))
             user = db_cur.fetchone()
-            print(user)
             if user:
-                session['user_id'] = user['login']
+                session['user'] = user['user_id']
                 return redirect('/profile')
             else:
                 return render_template('login.html', error='Invalid username or password')
@@ -85,9 +84,10 @@ def logout():
 def profile():
     if request.method == 'GET':
         with first_database('db1.db') as db_cur:
-           db_cur.execute('SELECT * FROM user WHERE login = ?',
-                          (session['user_id'],))
+           db_cur.execute('SELECT * FROM user WHERE user_id = ?',
+                          (session['user'],))
            user = db_cur.fetchone()
+           print(user)
            return render_template('profile.html', user=user)
     if request.method == 'PUT':
         return 'PUT'
@@ -118,6 +118,7 @@ def del_fav(favourite_id):
         return 'DELETE'
 
 
+@login_required
 @app.route('/prof-hist', methods=['GET', 'DELETE'])
 def prof_hist():
     if request.method == 'GET':
@@ -139,9 +140,18 @@ def items():
             return render_template('item.html', item=item)
 
     if request.method == 'POST':
+       if session.get('user') is None:
+           return redirect('/login')
+
        with first_database('db1.db') as db_cur:
-           form_data = request.form
-           db_cur.execute('''INSERT INTO item (name, photo, description, price_hour, price_day, price_week, price_month) VALUES (:name, :photo, :description, :price_hour, :price_day, :price_week, :price_month)''', request.form)
+           user_login = session['user']
+           db_cur.execute(
+               'select user_id from user where login = ?', (user_login,))
+           user_id = db_cur.fetchone()['user_id']
+           query_args = request.form
+           query_args['owner'] = user_id
+
+           db_cur.execute('''INSERT INTO item (name, photo, description, price_hour, price_day, price_week, price_month, owner) VALUES (:name, :photo, :description, :price_hour, :price_day, :price_week, :price_month, :owner)''', query_args)
 
            return redirect('/item')
 
