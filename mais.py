@@ -33,6 +33,39 @@ class first_database():
         self.con.close()
 
 
+class DbHendel:
+    db_file = 'db1.db'
+
+    def select(self, table_name, filter_dict=None):
+        if filter_dict is None:
+            filter_dict = {}
+        with first_database(self.db_file) as db_cur:
+            query = f'select * from {table_name} '
+            if filter_dict:
+                query += ' WHERE '
+                itms = []
+                for key, value in filter_dict.items():
+                    itms.append(f'{key} = {value}')
+                query += ' AND '.join(itms)
+
+                db_cur.execute(query, tuple(
+                    value for value in filter_dict.values()))
+            return db_cur.fetchall()
+
+    def insert(self, table_name, data_dict):
+        with first_database(self.db_file) as db_cur:
+            query = f'INSERT INTO {table_name} ( '
+            query += ','.join(data_dict.keys())
+            query += ' ) VALUES ( '
+            query += ','.join([f':{itms}' for itms in data_dict.keys()])
+            query += ' )'
+            db_cur.execute(query, data_dict)
+
+
+db_conector = DbHendel()
+
+
+
 @app.route("/")
 def hello_world():
     return render_template('index.html')
@@ -45,16 +78,14 @@ def login():
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
+        user_data = db_conector.select(
+            'user', {'login': username, 'password': password})
+        if user_data:
+            session['user'] = user_data[0]['user_id']
+            return redirect('/profile')
+        else:
+            return render_template('login.html', error='Invalid username or password')
 
-        with first_database('db1.db') as db_cur:
-            db_cur.execute(
-                'SELECT * FROM user WHERE login = ? AND password = ?', (username, password))
-            user = db_cur.fetchone()
-            if user:
-                session['user'] = user['user_id']
-                return redirect('/profile')
-            else:
-                return render_template('login.html', error='Invalid username or password')
 
 
 @app.route('/register', methods=['GET', 'POST'])
@@ -87,7 +118,6 @@ def profile():
            db_cur.execute('SELECT * FROM user WHERE user_id = ?',
                           (session['user'],))
            user = db_cur.fetchone()
-           print(user)
            return render_template('profile.html', user=user)
     if request.method == 'PUT':
         return 'PUT'
@@ -144,14 +174,11 @@ def items():
            return redirect('/login')
 
        with first_database('db1.db') as db_cur:
-           user_login = session['user']
-           db_cur.execute(
-               'select user_id from user where login = ?', (user_login,))
-           user_id = db_cur.fetchone()['user_id']
            query_args = request.form
-           query_args['owner'] = user_id
+           query = dict(query_args)
+           query['owner'] = session['user']
 
-           db_cur.execute('''INSERT INTO item (name, photo, description, price_hour, price_day, price_week, price_month, owner) VALUES (:name, :photo, :description, :price_hour, :price_day, :price_week, :price_month, :owner)''', query_args)
+           db_cur.execute('''INSERT INTO item (name, photo, description, price_hour, price_day, price_week, price_month, owner) VALUES (:name, :photo, :description, :price_hour, :price_day, :price_week, :price_month, :owner)''', query)
 
            return redirect('/item')
 
@@ -188,7 +215,7 @@ def contracts():
             contracts = db_cur.fetchall()
             return render_template('contract.html', contracts=contracts)
     if request.method == 'POST':
-        with first_database('db1.b') as db_cur:
+        with first_database('db1.db') as db_cur:
             form_data = request.form
             db_cur.execute(
                 '''INSERT INTO contract (text,start_date,end_date,leaser,taker,item) values (:text,:start_date,:end_date,:leaser,:taker,:item)''', request.form)
