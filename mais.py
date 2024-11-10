@@ -40,7 +40,7 @@ class DbHendel:
         if filter_dict is None:
             filter_dict = {}
         with first_database(self.db_file) as db_cur:
-            query = f'select * from {table_name} '
+            query = f'SELECT * FROM  {table_name}'
             if filter_dict:
                 query += ' WHERE '
                 itms = []
@@ -135,6 +135,7 @@ def profile():
 @app.route('/profile/favourites', methods=['GET', 'POST', 'PATCH', 'DELETE'])
 def profile_fav():
     if request.method == 'GET':
+
         return 'GET'
     if request.method == 'POST':
         return 'POST'
@@ -169,7 +170,6 @@ def prof_hist():
 def items():
     if request.method == 'GET':
         item = db_conector.select('item')
-        print(item)
         return render_template('item.html', item=item)
 
     if request.method == 'POST':
@@ -218,7 +218,7 @@ def leaser(leasers_id):
 def contracts():
     if request.method == 'GET':
         with first_database('db1.db') as db_cur:
-            db_conector.select('contract', {leaser: session['user']})
+            db_conector.select('contract', {"leaser": session['user']})
             contracts = db_cur.fetchall()
             return render_template('contract.html', contracts=contracts)
     if request.method == 'POST':
