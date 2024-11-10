@@ -101,13 +101,8 @@ def register():
 
 @app.route('/logout', methods=['GET', 'POST', 'DELETE'])
 def logout():
-    if request.method == 'GET':
-        return render_template('logout.html')
-    if request.method == 'POST':
-        return 'POST'
-    else:
-        return 'DELETE'
-
+    session.pop('user', None)
+    return redirect('/login')
 
 @login_required
 @app.route('/profile', methods=['GET', 'PUT', 'PATCH', 'DELETE'])

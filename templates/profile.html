@@ -13,6 +13,17 @@
             border-collapse: collapse;
             padding: 8px;
         }
+        .logout-btn {
+            margin: 10px 0;
+            padding: 10px 15px;
+            background-color: #f44336;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        .logout-btn:hover {
+            background-color: #d32f2f;
+        }
     </style>
     <script>
         function showForm() {
@@ -34,6 +45,11 @@
     </script>
 </head>
 <body>
+    <!-- Sezione Logout -->
+    <form action="/logout" method="POST">
+        <button type="submit" class="logout-btn">Logout</button>
+    </form>
+
     <!-- Sezione Profilo -->
     <h2>Profile</h2>
     {% if user %}
