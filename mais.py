@@ -45,7 +45,7 @@ class DbHendel:
                 query += ' WHERE '
                 itms = []
                 for key, value in filter_dict.items():
-                    itms.append(f'{key} = {value}')
+                    itms.append(f'{key} = ?')
                 query += ' AND '.join(itms)
 
                 db_cur.execute(query, tuple(
@@ -95,8 +95,7 @@ def register():
     if request.method == 'POST':
         with first_database('db1.db') as db_cur:
             form_data = request.form
-            db_cur.execute('''INSERT INTO user (login, password, ipn, full_name, contacts, photo, passport) VALUES (?, ?, ?, ?, ?, ?, ?)''', (
-                form_data['login'], form_data['password'], form_data['ipn'], form_data['full_name'], form_data['contacts'], form_data['photo'], form_data['passport']))
+            db_conector.insert('user', form_data)
         return redirect('/login')
 
 
@@ -114,11 +113,16 @@ def logout():
 @app.route('/profile', methods=['GET', 'PUT', 'PATCH', 'DELETE'])
 def profile():
     if request.method == 'GET':
-        with first_database('db1.db') as db_cur:
-           db_cur.execute('SELECT * FROM user WHERE user_id = ?',
-                          (session['user'],))
-           user = db_cur.fetchone()
-           return render_template('profile.html', user=user)
+        user_data = db_conector.select('user', {'user_id': session['user']})
+
+        if user_data:
+           user_data = user_data[0]
+
+           return render_template('profile.html', user=user_data)
+        else:
+
+            return "/login"
+
     if request.method == 'PUT':
         return 'PUT'
     if request.method == 'PATCH':
@@ -153,7 +157,7 @@ def del_fav(favourite_id):
 def prof_hist():
     if request.method == 'GET':
         with first_database('db1.db') as db_cur:
-            db_cur.execute('SELECT * FROM search_history')
+            db_conector.select('user', {'user_id': session['user']})
             history = db_cur.fetchall()
             return render_template('profile.html', history=history)
 
@@ -164,31 +168,29 @@ def prof_hist():
 @app.route('/item', methods=['GET', 'POST'])
 def items():
     if request.method == 'GET':
-        with first_database('db1.db') as db_cur:
-            db_cur.execute('SELECT * FROM item')
-            item = db_cur.fetchall()
-            return render_template('item.html', item=item)
+        item = db_conector.select('item')
+        print(item)
+        return render_template('item.html', item=item)
 
     if request.method == 'POST':
        if session.get('user') is None:
            return redirect('/login')
 
-       with first_database('db1.db') as db_cur:
-           query_args = request.form
-           query = dict(query_args)
-           query['owner'] = session['user']
+       query_args = request.form
+       query = dict(query_args)
+       query['owner'] = session['user']
 
-           db_cur.execute('''INSERT INTO item (name, photo, description, price_hour, price_day, price_week, price_month, owner) VALUES (:name, :photo, :description, :price_hour, :price_day, :price_week, :price_month, :owner)''', query)
+       db_conector.insert('item', query)
 
-           return redirect('/item')
+       return redirect('/item')
 
 
 @ app.route('/item/<item_id>', methods=['GET', 'DELETE'])
 def item(item_id):
     if request.method == 'GET':
         with first_database('db1.db') as db_cur:
-            db_cur.execute('SELECT * FROM item')
-            item = db_cur.fetchone()
+            db_conector.select('item', {'item_id': item_id})
+            item = db_cur.fetchall()
             return render_template('item.html', item=item)
     if request.method == 'DELETE':
         return 'DELETE'
@@ -197,12 +199,17 @@ def item(item_id):
 @app.route('/leasers', methods=['GET'])
 def leasers():
     if request.method == 'GET':
-        return 'GET'
+        with first_database('db1.db') as db_cur:
+            db_conector.select('leaser')
+            leasers = db_cur.fetchall()
+            return render_template('profile.html', user=leasers)
 
 
 @app.route('/leasers/<leasers_id>', methods=['GET'])
 def leaser(leasers_id):
     if request.method == 'GET':
+        with first_database('db1.db') as db_cur:
+            db_conector.select('leaser', {'leaser_id': leasers_id})
         return 'GET'
 
 
@@ -211,20 +218,22 @@ def leaser(leasers_id):
 def contracts():
     if request.method == 'GET':
         with first_database('db1.db') as db_cur:
-            db_cur.execute('select * from contract')
+            db_conector.select('contract', {leaser: session['user']})
             contracts = db_cur.fetchall()
             return render_template('contract.html', contracts=contracts)
     if request.method == 'POST':
         with first_database('db1.db') as db_cur:
             form_data = request.form
-            db_cur.execute(
-                '''INSERT INTO contract (text,start_date,end_date,leaser,taker,item) values (:text,:start_date,:end_date,:leaser,:taker,:item)''', request.form)
+            db_conector.insert('contract', form_data)
             return redirect('/')
 
 @app.route('/contract/<contracts_id>', methods=['GET', 'PATCH', 'PUT'])
 def contract(contracts_id):
     if request.methods == 'GET':
-        return 'GET'
+        with first_database('db1.db') as db_cur:
+            db_conector.select('contract', {'contract_id': contracts_id})
+            contract = db_cur.fetchone()
+            return render_template('contract.html', contract=contract)
     if request.method == 'PATCH':
         return 'PATCH'
     if request.method == 'PUT':
@@ -244,15 +253,20 @@ def complain():
     if request.method == 'POST':
         with first_database('db1.db') as db_cur:
             form_data = request.form
-            db_cur.execute(
-                '''INSERT INTO feedback (author,user,grade,contract) VALUES(:author, :user, :grade, :contract)''', request.form)
+            db_conector.insert('feedback', form_data)
             return redirect('/')
 
 
 @app.route('/compare', methods=['GET', 'PUT', 'PATCH'])
 def compare():
     if request.methods == 'GET':
-        return 'GET'
+        with first_database('db1.db') as db_cur:
+            db_conector.select('item', {'item_id'})
+            item = db_cur.fetchone()
+            db_conector.select('item', {'item_id'})
+            item2 = db_cur.fetchone()
+            return render_template('compare.html', item=item, item2=item2)
+
     if request.method == 'PATCH':
         return 'PATCH'
     if request.method == 'PUT':
