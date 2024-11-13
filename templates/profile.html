@@ -5,24 +5,70 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My Profile</title>
     <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+        h1, h2 {
+            color: #333;
+        }
         #itemForm, #historyTable {
             display: none; /* Nasconde il form e la tabella inizialmente */
+            margin-top: 20px;
         }
         table, th, td {
-            border: 1px solid black;
+            border: 1px solid #ddd;
             border-collapse: collapse;
-            padding: 8px;
+            padding: 10px;
+            text-align: left;
+        }
+        table th {
+            background-color: #f2f2f2;
         }
         .logout-btn {
-            margin: 10px 0;
-            padding: 10px 15px;
+            margin: 20px 0;
+            padding: 12px 18px;
             background-color: #f44336;
             color: white;
             border: none;
+            border-radius: 5px;
             cursor: pointer;
+            font-size: 16px;
         }
         .logout-btn:hover {
             background-color: #d32f2f;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+        }
+        .user-info ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        .user-info li {
+            margin: 10px 0;
+        }
+        .user-info img {
+            max-width: 150px;
+            border-radius: 8px;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        button:hover {
+            background-color: #45a049;
         }
     </style>
     <script>
@@ -45,71 +91,84 @@
     </script>
 </head>
 <body>
-    <!-- Sezione Logout -->
-    <form action="/logout" method="POST">
-        <button type="submit" class="logout-btn">Logout</button>
-    </form>
 
-    <!-- Sezione Profilo -->
-    <h2>Profile</h2>
-    {% if user %}
-        <ul>
-            <li><strong>Name:</strong> {{ user.full_name }}</li>
-            <li><strong>Contact:</strong> {{ user.contacts }}</li>
-            <li><strong>IPN:</strong> {{ user.ipn }}</li>
-            <li><strong>Photo:</strong> <img src="{{ user.photo }}" alt="User photo" style="width:150px;height:auto;"></li>
-            <li><strong>Passport:</strong> {{ user.passport }}</li>
-        </ul>
-    {% else %}
-        <p>User not found.</p>
-    {% endif %}
+    <div class="container">
+        <!-- Sezione Logout -->
+        <form action="/logout" method="POST">
+            <button type="submit" class="logout-btn">Logout</button>
+        </form>
 
-    <!-- Sezione Aggiunta Item -->
-    <h1>Add Item</h1>
-    <button id="showButton" onclick="showForm()">Add Item</button>
+        <!-- Sezione Profilo -->
+        <h2>Profile</h2>
+        <div class="user-info">
+            {% if user %}
+                <ul>
+                    <li><strong>Name:</strong> {{ user.full_name }}</li>
+                    <li><strong>Contact:</strong> {{ user.contacts }}</li>
+                    <li><strong>IPN:</strong> {{ user.ipn }}</li>
+                    <li><strong>Photo:</strong> <img src="{{ user.photo }}" alt="User photo"></li>
+                    <li><strong>Passport:</strong> {{ user.passport }}</li>
+                </ul>
+            {% else %}
+                <p>User not found.</p>
+            {% endif %}
+        </div>
 
-    <form id="itemForm" action="/item" method="post">
-        Name: <br>
-        <input type="text" name="name" required><br>
-        Photo URL:<br>
-        <input type="text" name="photo" required><br>
-        Description: <br>
-        <input type="text" name="description" required><br>
-        Price per hour: <br>
-        <input type="number" name="price_hour" step="0.01" required><br>
-        Price per day:<br>
-        <input type="number" name="price_day" step="0.01" required><br>
-        Price per week: <br>
-        <input type="number" name="price_week" step="0.01" required><br>
-        Price per month: <br>
-        <input type="number" name="price_month" step="0.01" required><br>
-        <input type="submit" value="Send">
-    </form>
+        <!-- Sezione Aggiunta Item -->
+        <h2>Add Item</h2>
+        <button id="showButton" onclick="showForm()">Add Item</button>
 
-    <!-- Sezione Cronologia -->
-    <h2>Search History</h2>
-    <button id="toggleButton" onclick="toggleTable()">Show Search History</button>
+        <form id="itemForm" action="/item" method="post">
+            <label>Name:</label><br>
+            <input type="text" name="name" required><br><br>
 
-    <div id="historyTable">
-        <p>History Count: {{ history|length }}</p>
-        {% if history %}
-            <table>
-                <tr>
-                    <th>User</th>
-                    <th>Text</th>
-                    <th>Timestamp</th>
-                </tr>
-                {% for one_history in history %}
+            <label>Photo URL:</label><br>
+            <input type="text" name="photo" required><br><br>
+
+            <label>Description:</label><br>
+            <input type="text" name="description" required><br><br>
+
+            <label>Price per hour:</label><br>
+            <input type="number" name="price_hour" step="0.01" required><br><br>
+
+            <label>Price per day:</label><br>
+            <input type="number" name="price_day" step="0.01" required><br><br>
+
+            <label>Price per week:</label><br>
+            <input type="number" name="price_week" step="0.01" required><br><br>
+
+            <label>Price per month:</label><br>
+            <input type="number" name="price_month" step="0.01" required><br><br>
+
+            <input type="submit" value="Send">
+        </form>
+
+        <!-- Sezione Cronologia -->
+        <h2>Search History</h2>
+        <button id="toggleButton" onclick="toggleTable()">Show Search History</button>
+
+        <div id="historyTable">
+            <p>History Count: {{ history|length }}</p>
+            {% if history %}
+                <table>
                     <tr>
-                        <td>{{ one_history['user'] }}</td>
-                        <td>{{ one_history['search_text'] }}</td>
-                        <td>{{ one_history['timestamp'] }}</td>
+                        <th>User</th>
+                        <th>Text</th>
+                        <th>Timestamp</th>
                     </tr>
-                {% endfor %}
-            </table>
-        {% else %}
-            <p>No search history available.</p>
-        {% endif %}
+                    {% for one_history in history %}
+                        <tr>
+                            <td>{{ one_history['user'] }}</td>
+                            <td>{{ one_history['search_text'] }}</td>
+                            <td>{{ one_history['timestamp'] }}</td>
+                        </tr>
+                    {% endfor %}
+                </table>
+            {% else %}
+                <p>No search history available.</p>
+            {% endif %}
+        </div>
     </div>
+
 </body>
 </html>

@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Compare Items</title>
+</head>
+<body>
+    <h1>Compare Items</h1>
+
+    <!-- Item 1 Details -->
+    <h2>Item 1: {{ item1[0].name if item1 else "Not Found" }}</h2>
+    {% if item1 %}
+        <p><strong>Name:</strong> {{ item1[0].name }}</p>
+        <p><strong>Description:</strong> {{ item1[0].description }}</p>
+        <p><strong>Price per Hour:</strong> ${{ item1[0].price_hour }}</p>
+        <p><strong>Price per Day:</strong> ${{ item1[0].price_day }}</p>
+        <p><strong>Price per Week:</strong> ${{ item1[0].price_week }}</p>
+        <p><strong>Price per Month:</strong> ${{ item1[0].price_month }}</p>
+        <p><strong>Photo:</strong> <img src="{{ item1[0].photo }}" alt="Item Photo" style="width:150px;"></p>
+    {% else %}
+        <p>Item 1 not found.</p>
+    {% endif %}
+
+    <!-- Item 2 Details -->
+    <h2>Item 2: {{ item2[0].name if item2 else "Not Found" }}</h2>
+    {% if item2 %}
+        <p><strong>Name:</strong> {{ item2[0].name }}</p>
+        <p><strong>Description:</strong> {{ item2[0].description }}</p>
+        <p><strong>Price per Hour:</strong> ${{ item2[0].price_hour }}</p>
+        <p><strong>Price per Day:</strong> ${{ item2[0].price_day }}</p>
+        <p><strong>Price per Week:</strong> ${{ item2[0].price_week }}</p>
+        <p><strong>Price per Month:</strong> ${{ item2[0].price_month }}</p>
+        <p><strong>Photo:</strong> <img src="{{ item2[0].photo }}" alt="Item Photo" style="width:150px;"></p>
+    {% else %}
+        <p>Item 2 not found.</p>
+    {% endif %}
+</body>
+</html>
+

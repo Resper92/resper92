@@ -1,27 +1,92 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="it">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Item Details</title>
+    <title>Lista degli Elementi</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        /* Aggiungiamo uno stile personalizzato per le immagini */
+        .item-photo {
+            max-width: 100px;
+            border-radius: 8px;
+            object-fit: cover;
+        }
+
+        /* Spazio tra le righe della tabella */
+        .table th, .table td {
+            vertical-align: middle;
+        }
+
+        /* Personalizzazione del titolo */
+        h1 {
+            text-align: center;
+            margin-bottom: 40px;
+            color: #5a5a5a;
+        }
+
+        /* Aggiunta di un bordo arrotondato alla tabella */
+        .table-bordered {
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        /* Aggiungi un po' di padding alla tabella per renderla più leggibile */
+        .table {
+            padding: 20px;
+        }
+
+        /* Bottone per il ritorno alla home */
+        .btn-home {
+            display: block;
+            margin: 30px auto;
+            font-size: 16px;
+            padding: 10px 20px;
+            border-radius: 5px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            transition: background-color 0.3s;
+        }
+
+        .btn-home:hover {
+            background-color: #0056b3;
+        }
+    </style>
 </head>
 <body>
-    <p>Item count: {{ item|length }}</p>
-    {% for one_item in item %}
-        <div>
-            <h2>{{ one_item.name }}</h2>
-            <p><strong>Photo URL:</strong> {{ one_item.photo }}</p>
-            <p><strong>Description:</strong> {{ one_item.description }}</p>
-            <h3>Pricing</h3>
-            <ul>
-                <li>Price per hour: ${{ one_item.price_hour }}</li>
-                <li>Price per day: ${{ one_item.price_day }}</li>
-                <li>Price per week: ${{ one_item.price_week }}</li>
-                <li>Price per month: ${{ one_item.price_month }}</li>
-            </ul>
-            <hr>
-        </div>
-    {% endfor %}
-</body>
+    <div class="container my-5">
+        <h1>Lista degli Elementi</h1>
 
-</html>
+        {% if items %}
+            <table class="table table-bordered table-striped">
+                <thead class="thead-dark">
+                    <tr>
+                        <th>Nome</th>
+                        <th>Foto</th>
+                        <th>Descrizione</th>
+                        <th>Prezzo per Ora</th>
+                        <th>Prezzo per Giorno</th>
+                        <th>Prezzo per Settimana</th>
+                        <th>Prezzo per Mese</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in items %}
+                    <tr>
+                        <td>{{ item.name }}</td>
+                        <td><img src="{{ item.photo }}" alt="Foto di {{ item.name }}" class="item-photo"></td>
+                        <td>{{ item.description }}</td>
+                        <td>{{ item.price_hour }} €</td>
+                        <td>{{ item.price_day }} €</td>
+                        <td>{{ item.price_week }} €</td>
+                        <td>{{ item.price_month }} €</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <p class="text-warning text-center">Nessun elemento trovato.</p>
+        {% endif %}
+
+       
