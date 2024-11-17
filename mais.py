@@ -195,8 +195,8 @@ def leaser(leasers_id):
 def contracts():
     if request.method == 'GET':
         init_db()
-        contracts = db_session.execute(select(Contract)).scalars()
-        return render_template('contract.html', contracts=contracts)
+        contract = db_session.execute(select(Contract)).scalars()
+        return render_template('contract.html', contracts=contract)
     if request.method == 'POST':
         if session.get('user') is None:
             init_db()
