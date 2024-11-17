@@ -1,6 +1,9 @@
 from flask import Flask, render_template, request, redirect, session, jsonify
 import sqlite3
+from sqlalchemy import select, delete
 from functools import wraps
+from conectdb import init_db, db_session
+from model import User, Item, Contract, Favorite, Feedback, Search_history
 
 app = Flask(__name__, template_folder='templates')
 app.secret_key = 'asdasdasda12122'
@@ -50,6 +53,33 @@ class DbHendel:
             result = db_cur.fetchall()
             return result
 
+    def join(self, table_name, filter_dict=None):
+        if filter_dict is None:
+            filter_dict = {}
+
+        with first_database(self.db_file) as db_cur:
+            query = f'SELECT * FROM {table_name}'
+            if filter_dict:
+                itm = [f'{key} = ?' for key in filter_dict.keys()]
+                query += ' WHERE ' + ' AND '.join(itm)
+            db_cur.execute(query, tuple(filter_dict.values()))
+            result = db_cur.fetchall()
+            return result
+
+    def update(self, table_name, data_dict, filter_dict=None):
+        if filter_dict is None:
+            filter_dict = {}
+
+        with first_database(self.db_file) as db_cur:
+            query = f'UPDATE {table_name} SET '
+            query += ','.join([f'{key} = ?' for key in data_dict.keys()])
+            if filter_dict:
+                query += ' WHERE '
+                query += ' AND '.join(
+                    [f'{key} = ?' for key in filter_dict.keys()])
+            db_cur.execute(query, tuple(data_dict.values()
+                                        ) + tuple(filter_dict.values()))
+
 
 
     def insert(self, table_name, data_dict):
@@ -60,6 +90,17 @@ class DbHendel:
             query += ','.join([f':{itms}' for itms in data_dict.keys()])
             query += ' )'
             db_cur.execute(query, data_dict)
+
+    def delete(self, table_name, filter_dict=None):
+        if filter_dict is None:
+            filter_dict = {}
+
+        with first_database(self.db_file) as db_cur:
+            query = f'DELETE FROM {table_name}'
+            if filter_dict:
+                itm = [f'{key} = ?' for key in filter_dict.keys()]
+                query += ' WHERE ' + ' AND '.join(itm)
+            db_cur.execute(query, tuple(filter_dict.values()))
 
 
 db_conector = DbHendel()
@@ -78,10 +119,11 @@ def login():
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
-        user_data = db_conector.select(
-            'user', {'login': username, 'password': password})
+        init_db()
+        user_data = db_session.execute(select(User).filter_by(
+            login=username)).scalar()
         if user_data:
-            session['user'] = user_data[0]['user_id']
+            session['user'] = user_data.user_id
             return redirect('/profile')
         else:
             return render_template('login.html', error='Invalid username or password')
@@ -93,9 +135,11 @@ def register():
     if request.method == 'GET':
         return render_template('registration.html')
     if request.method == 'POST':
-        with first_database('db1.db') as db_cur:
-            form_data = request.form
-            db_conector.insert('user', form_data)
+        form_data = dict(request.form)
+        init_db()
+        user = User(**form_data)
+        db_session.add(user)
+        db_session.commit()
         return redirect('/login')
 
 
@@ -108,15 +152,12 @@ def logout():
 @app.route('/profile', methods=['GET', 'PUT', 'PATCH', 'DELETE'])
 def profile():
     if request.method == 'GET':
-        user_data = db_conector.select('user', {'user_id': session['user']})
-
-        if user_data:
-           user_data = user_data[0]
-
-           return render_template('profile.html', user=user_data)
-        else:
-
-            return "/login"
+        init_db()
+        user_data = db_session.execute(
+            select(User).filter_by(user_id=session['user'])).scalar()
+        return render_template('profile.html', user=user_data)
+    if session.get('user') is None:
+        return redirect('/login')
 
     if request.method == 'PUT':
         return 'PUT'
@@ -130,7 +171,6 @@ def profile():
 @app.route('/profile/favourites', methods=['GET', 'POST', 'PATCH', 'DELETE'])
 def profile_fav():
     if request.method == 'GET':
-
         return 'GET'
     if request.method == 'POST':
         return 'POST'
@@ -152,39 +192,51 @@ def del_fav(favourite_id):
 @app.route('/prof-hist', methods=['GET', 'DELETE'])
 def prof_hist():
     if request.method == 'GET':
-       history = db_conector.select(
-           'search_history', {'user': session['user']})
-       print(history)
+       init_db()
+       history = db_session.execute(select(Search_history)).scalars()
        return render_template('profile.html', prof_hist=history)
 
     if request.method == 'DELETE':
         return 'DELETE'
 
 
-@app.route('/item', methods=['GET', 'POST'])
+@app.route('/item', methods=['GET', 'POST', 'DELETE'])
 def items():
     if request.method == 'GET':
-        itemz = db_conector.select('item')
-        return render_template('item.html', items=itemz)
+       init_db()
+       item_data = select(Item)
+       item_data = db_session.execute(select(Item)).scalars()
+       return render_template('item.html', items=item_data)
 
 
     if request.method == 'POST':
        if session.get('user') is None:
            return redirect('/login')
 
-       query_args = request.form
-       query = dict(query_args)
-       query['owner'] = session['user']
+       init_db()
+       item = Item(**request.form)
+       item.owner = session['user']
 
-       db_conector.insert('item', query)
+       db_session.add(item)
+       db_session.commit()
 
        return redirect('/item')
+
+    if request.method == 'DELETE':
+        init_db()
+
+        item = db_session.get(Item, 'item_id')
+        if item:
+          db_session.delete(item)
+          db_session.commit()
+          return jsonify(success=True), 200
 
 
 @ app.route('/item/<item_id>', methods=['GET', 'DELETE'])
 def item(item_id):
     if request.method == 'GET':
-        item = db_conector.select('item', {'id': item_id})
+        init_db()
+        item = db_session.execute(select(Item).filter_by(id=item_id)).scalar()
         print(item)
         return render_template('item.html', item=item)
     if request.method == 'DELETE':
@@ -194,16 +246,17 @@ def item(item_id):
 @app.route('/leasers', methods=['GET'])
 def leasers():
     if request.method == 'GET':
-        leasers = db_conector.select('user')
-        print(leasers)
+        init_db()
+        leasers = db_session.execute(select(User)).scalars()
         return 'GET'
 
 
 @app.route('/leasers/<leasers_id>', methods=['GET'])
 def leaser(leasers_id):
     if request.method == 'GET':
-        leasers_id = db_conector.select('contract', {'leaser': leasers_id})
-
+        init_db()
+        leasers_id = db_session.execute(
+            select(User).filter_by(user_id=leasers_id)).scalar()
         return 'GET'
 
 
@@ -211,20 +264,24 @@ def leaser(leasers_id):
 @app.route('/contract', methods=['GET', 'POST'])
 def contracts():
     if request.method == 'GET':
-        db_conector.select('contract', {"leaser": session['user']})
+        init_db()
+        contracts = db_session.execute(select(Contract)).scalars()
         return render_template('contract.html', contracts=contracts)
     if request.method == 'POST':
-        with first_database('db1.db') as db_cur:
-            form_data = request.form
-            db_conector.insert('contract', form_data)
+        if session.get('user') is None:
+            init_db()
+            contract = Contract(**request.form)
+            contract.leaser = session['user']
+            db_session.add(contract)
+            db_session.commit()
             return redirect('/')
 
 @app.route('/contract/<contracts_id>', methods=['GET', 'PATCH', 'PUT'])
 def contract(contracts_id):
     if request.methods == 'GET':
-        contract = db_conector.select(
-            'contract', {'contract_id': contracts_id})
-
+        init_db()
+        contract = db_session.execute(
+            select(Contract).filter_by(contract_id=contracts_id)).scalar()
         return render_template('contract.html', contract=contract)
     if request.method == 'PATCH':
         return 'PATCH'
@@ -243,19 +300,22 @@ def search():
 @app.route('/complain', methods=['POST'])
 def complain():
     if request.method == 'POST':
-        complain = db_conector.insert('complain', request.form)
+        init_db()
+        complain = Feedback(**request.form)
+        db_session.add(complain)
+        db_session.commit()
         return redirect('/')
 
 
 @app.route('/compare', methods=['GET', 'PUT', 'PATCH'])
 def compare():
     if request.method == 'GET':
-        name1 = request.args.get('name1')
-        name2 = request.args.get('name2')
-        item = db_conector.select('item', {'name': name1})
-        item2 = db_conector.select('item', {'name': name2})
-        print(item, item2)
-        return render_template('compare.html', item=item, item2=item2)
+        init_db()
+        name1 = db_session.execute(select(Item).filter_by(
+            name=request.args.get('name1'))).scalar()
+        name2 = db_session.execute(select(Item).filter_by(
+            name=request.args.get('name2'))).scalar()
+        return render_template('compare.html', item=name1, item2=name2)
 
     if request.method == 'PATCH':
         return 'PATCH'

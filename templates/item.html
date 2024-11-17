@@ -6,53 +6,64 @@
     <title>Lista degli Elementi</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/4.5.2/css/bootstrap.min.css">
     <style>
-        /* Aggiungiamo uno stile personalizzato per le immagini */
+        /* Stile personalizzato */
         .item-photo {
             max-width: 100px;
             border-radius: 8px;
             object-fit: cover;
         }
-
-        /* Spazio tra le righe della tabella */
-        .table th, .table td {
-            vertical-align: middle;
-        }
-
-        /* Personalizzazione del titolo */
         h1 {
             text-align: center;
             margin-bottom: 40px;
             color: #5a5a5a;
         }
-
-        /* Aggiunta di un bordo arrotondato alla tabella */
         .table-bordered {
             border-radius: 10px;
             overflow: hidden;
         }
-
-        /* Aggiungi un po' di padding alla tabella per renderla più leggibile */
         .table {
             padding: 20px;
         }
-
-        /* Bottone per il ritorno alla home */
+        .btn-home, .btn-delete {
+            font-size: 16px;
+            padding: 5px 10px;
+            border-radius: 5px;
+        }
         .btn-home {
             display: block;
             margin: 30px auto;
-            font-size: 16px;
-            padding: 10px 20px;
-            border-radius: 5px;
             background-color: #007bff;
             color: white;
             border: none;
-            transition: background-color 0.3s;
         }
-
-        .btn-home:hover {
-            background-color: #0056b3;
+        .btn-delete {
+            background-color: #dc3545;
+            color: white;
+            border: none;
+        }
+        .btn-home:hover, .btn-delete:hover {
+            opacity: 0.8;
         }
     </style>
+    <script>
+        // Funzione per confermare ed eseguire la rimozione di un elemento
+        function removeItem(itemId) {
+            if (confirm("Sei sicuro di voler rimuovere questo elemento?")) {
+                fetch(`/item/${itemId}`, {
+                    method: 'DELETE'
+                })
+                .then(response => {
+                    if (response.ok) {
+                        alert("Elemento rimosso con successo!");
+                        location.reload(); // Ricarica la pagina per aggiornare la lista
+                    } else {
+                        alert("Errore durante la rimozione dell'elemento.");
+                    }
+                })
+                .catch(error => console.error("Errore:", error));
+            }
+        }
+    </script>
 </head>
 <body>
     <div class="container my-5">
@@ -69,6 +80,7 @@
                         <th>Prezzo per Giorno</th>
                         <th>Prezzo per Settimana</th>
                         <th>Prezzo per Mese</th>
+                        <th>Azioni</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -81,6 +93,9 @@
                         <td>{{ item.price_day }} €</td>
                         <td>{{ item.price_week }} €</td>
                         <td>{{ item.price_month }} €</td>
+                        <td>
+                            <button class="btn btn-delete" onclick="removeItem({{ item.id }})">Rimuovi</button>
+                        </td>
                     </tr>
                     {% endfor %}
                 </tbody>
@@ -88,5 +103,6 @@
         {% else %}
             <p class="text-warning text-center">Nessun elemento trovato.</p>
         {% endif %}
-
-       
+    </div>
+</body>
+</html>
