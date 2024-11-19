@@ -1,4 +1,5 @@
-from sqlalchemy import Column, Integer, String, ForeignKey, REAL
+from sqlalchemy import Column, Integer, String, ForeignKey, REAL, DateTime
+import datetime
 from sqlalchemy.orm import mapped_column
 from conectdb import Base
 
@@ -56,6 +57,7 @@ class Contract(Base):
     leaser = mapped_column(ForeignKey('user.user_id'))
     taker = mapped_column(ForeignKey('user.user_id'))
     item = mapped_column(ForeignKey('item.id'))
+    signet_datetime = Column(DateTime, default=datetime.datetime.now)
 
     def __init__(self, text=None, start_date=None, end_date=None, leaser=None, taker=None, item=None):
         self.text = text
