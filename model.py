@@ -14,7 +14,7 @@ class User(Base):
     contacts = Column(String(120))
     photo = Column(String(120))
     passport = Column(String(120), unique=True)
-    email = Column(String(200), unique=True)
+    email = Column(String(200), nullable=True)
 
     def init(self, login=None, password=None, ipn=None, full_name=None, contacts=None, photo=None, passport=None, email=None):
         self.login = login
@@ -58,8 +58,6 @@ class Contract(Base):
     leaser = mapped_column(ForeignKey('user.user_id'))
     taker = mapped_column(ForeignKey('user.user_id'))
     item = mapped_column(ForeignKey('item.id'))
-    signet_datetime = Column(DateTime, nullable=False,
-                             server_default=func.now())
 
     def __init__(self, text=None, start_date=None, end_date=None, leaser=None, taker=None, item=None):
         self.text = text
