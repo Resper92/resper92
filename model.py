@@ -58,6 +58,8 @@ class Contract(Base):
     leaser = mapped_column(ForeignKey('user.user_id'))
     taker = mapped_column(ForeignKey('user.user_id'))
     item = mapped_column(ForeignKey('item.id'))
+    signet_datetime = Column(DateTime, nullable=True,
+                             server_default=func.now())
 
     def __init__(self, text=None, start_date=None, end_date=None, leaser=None, taker=None, item=None):
         self.text = text
