@@ -6,7 +6,7 @@
     <title>Home</title>
 </head>
 <body>
-    <h1>Benvenuto nella Home</h1>
+    <h1> Home</h1>
     <nav>
         <a href="login">Login</a> | 
         <a href="register">Registrati</a> | 
@@ -14,6 +14,13 @@
         <a href=" item"> Item</a> |
         <a href="profile">Profile</a> |
     </nav>
-    <p>Questa è la pagina principale della tua applicazione.</p>
+    <br>
+    <form action="/search" method="get">
+        <label for="name">Cerca un elemento per nome:</label>
+        <input type="text" id="name" name="name">
+        <button type="submit">Cerca</button>
+    </form>
+
+      
 </body>
 </html>

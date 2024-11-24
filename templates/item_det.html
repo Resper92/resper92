@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dettagli dell'Elemento</title>
+</head>
+<body>
+    <h1>Dettagli dell'Elemento</h1>
+
+    <!-- Mostra i dettagli dell'elemento se presente -->
+    {% if item %}
+        <p><strong>Nome:</strong> {{ item.name }}</p>
+        <p><strong>Descrizione:</strong> {{ item.description }}</p>
+        <p><strong>Proprietario:</strong> {{ item.owner }}</p>
+        <p><strong>Prezzo per ora:</strong> ₴ {{ item.price_hour }}</p>
+        <p><strong>Prezzo per giorno:</strong> ₴ {{ item.price_day }}</p>
+        <p><strong>Prezzo per settimana:</strong> ₴ {{ item.price_week }}</p>
+        <p><strong>Prezzo per mese:</strong> ₴ {{ item.price_month }}</p>
+    {% else %}
+        <p>Elemento non trovato.</p>
+    {% endif %}
+
+    <!-- Opzione per eliminare l'elemento -->
+    <form action="/item/{{ item.id }}" method="delete" onsubmit="return confirm('Sei sicuro di voler eliminare questo elemento?');">
+        <input type="hidden" name="_method" value="DELETE">
+        <button type="submit">Elimina</button>
+    </form>
+
+    <a href="/">Torna alla Home</a>
+</body>
+</html>

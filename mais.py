@@ -130,7 +130,7 @@ def prof_hist():
         return 'DELETE'
 
 
-@app.route('/item', methods=['GET', 'POST', 'DELETE'])
+@app.route('/item', methods=['GET', 'POST'])
 def items():
     if request.method == 'GET':
        init_db()
@@ -152,25 +152,21 @@ def items():
 
        return redirect('/item')
 
-    if request.method == 'DELETE':
-        init_db()
 
-        item = db_session.get(Item, 'item_id')
-        if item:
-          db_session.delete(item)
-          db_session.commit()
-          return jsonify(success=True), 200
-
-
-@ app.route('/item/<item_id>', methods=['GET', 'DELETE'])
+@ app.route('/item/<int:item_id>', methods=['GET', 'DELETE'])
 def item(item_id):
     if request.method == 'GET':
         init_db()
         item = db_session.execute(select(Item).filter_by(id=item_id)).scalar()
         print(item)
-        return render_template('item.html', item=item)
+        return render_template('item_det.html', item=item)
     if request.method == 'DELETE':
-        return 'DELETE'
+        if session.get('user') == (item.owner):
+            init_db()
+            item = db_session.get(Item, item_id)
+            db_session.delete(item)
+            db_session.commit()
+            return jsonify(success=True), 200
 
 
 @app.route('/leasers', methods=['GET'])
@@ -221,8 +217,11 @@ def contract(contracts_id):
 
 @app.route('/search', methods=['GET', 'POST'])
 def search():
-    if request.methods == 'GET':
-        return 'GET'
+    if request.method == 'GET':
+        name = request.args.get('name')
+        init_db()
+        item = db_session.execute(select(Item).filter_by(name=name)).scalar()
+        return render_template('item_det.html', item=item)
     if request.methods == 'POST':
         return 'POST'
 
