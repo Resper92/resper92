@@ -36,11 +36,6 @@
             color: white;
             border: none;
         }
-        .btn-delete {
-            background-color: #dc3545;
-            color: white;
-            border: none;
-        }
         .btn-home:hover, .btn-delete:hover {
             opacity: 0.8;
         }
@@ -86,15 +81,13 @@
                 <tbody>
                     {% for item in items %}
                     <tr>
-                        <td>{{ item.name }}</td>
+                        <td><a href="/item/{{ item.id }}">{{ item.name }}</a></td>
                         <td><img src="{{ item.photo }}" alt="Foto di {{ item.name }}" class="item-photo"></td>
                         <td>{{ item.description }}</td>
                         <td>{{ item.price_hour }} €</td>
                         <td>{{ item.price_day }} €</td>
                         <td>{{ item.price_week }} €</td>
                         <td>{{ item.price_month }} €</td>
-                        <td>
-                            <button class="btn btn-delete" onclick="removeItem({{ item.id }})">Rimuovi</button>
                         </td>
                     </tr>
                     {% endfor %}
@@ -103,6 +96,7 @@
         {% else %}
             <p class="text-warning text-center">Nessun elemento trovato.</p>
         {% endif %}
+        
     </div>
 </body>
 </html>

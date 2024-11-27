@@ -143,31 +143,12 @@
 
             <input type="submit" value="Send">
         </form>
+        <br>
+        
+        <a href="/favorite" class="btn btn-primary mt-4">My favorite</a>
 
-        <!-- Sezione Cronologia -->
-        <h2>Search History</h2>
-        <button id="toggleButton" onclick="toggleTable()">Show Search History</button>
+        <a href="/" class="btn btn-secondary mt-4">Torna alla Home</a>
 
-        <div id="historyTable">
-            <p>History Count: {{ history|length }}</p>
-            {% if history %}
-                <table>
-                    <tr>
-                        <th>User</th>
-                        <th>Text</th>
-                        <th>Timestamp</th>
-                    </tr>
-                    {% for one_history in history %}
-                        <tr>
-                            <td>{{ one_history['user'] }}</td>
-                            <td>{{ one_history['search_text'] }}</td>
-                            <td>{{ one_history['timestamp'] }}</td>
-                        </tr>
-                    {% endfor %}
-                </table>
-            {% else %}
-                <p>No search history available.</p>
-            {% endif %}
         </div>
     </div>
 

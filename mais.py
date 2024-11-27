@@ -81,27 +81,41 @@ def logout():
 @login_required
 @app.route('/profile', methods=['GET', 'PUT', 'PATCH', 'DELETE'])
 def profile():
+    init_db()
     if request.method == 'GET':
-        init_db()
         user_data = db_session.execute(
             select(User).filter_by(user_id=session['user'])).scalar()
         return render_template('profile.html', user=user_data)
+    if request.method == 'PUT':
+      user = db_session.execute(select(user).filter_by(
+          user_id=session['user'])).scalar()
+      user.full_name = request.form['full_name']
+      db_session.commit()
+      return redirect('/profile')
+    if request.method == 'DELETE':
+        user = db_session.execute(select(user).filter_by(
+            user_id=session['user'])).scalar()
+        db_session.delete(user)
+        db_session.commit()
+        session.pop('user', None)
+        session.pop(login, None)
+        return redirect('/login')
     if session.get('user') is None:
         return redirect('/login')
 
-    if request.method == 'PUT':
-        return 'PUT'
-    if request.method == 'PATCH':
-        return 'PATCH'
-    if request.method == 'DELETE':
-        return 'DELETE'
-
 
 @login_required
-@app.route('/profile/favourites', methods=['GET', 'POST', 'PATCH', 'DELETE'])
-def profile_fav():
+@app.route('/favorite', methods=['GET', 'POST', 'PATCH', 'DELETE'])
+def fav():
     if request.method == 'GET':
-        return 'GET'
+        init_db()
+        fav_id_item = db_session.execute(
+            select(Favorite).filter_by(user=session['user'])).scalars()
+        fav_it = db_session.execute(
+            select(Item).filter_by(id=fav_id_item)).scalars()
+
+        return render_template('favorite.html', fav=fav_it)
+
     if request.method == 'POST':
         return 'POST'
     if request.method == 'PUT':
@@ -153,20 +167,27 @@ def items():
        return redirect('/item')
 
 
+@ login_required
 @ app.route('/item/<int:item_id>', methods=['GET', 'DELETE'])
 def item(item_id):
     if request.method == 'GET':
         init_db()
         item = db_session.execute(select(Item).filter_by(id=item_id)).scalar()
-        print(item)
-        return render_template('item_det.html', item=item)
-    if request.method == 'DELETE':
-        if session.get('user') == (item.owner):
-            init_db()
-            item = db_session.get(Item, item_id)
-            db_session.delete(item)
-            db_session.commit()
-            return jsonify(success=True), 200
+        return render_template('item_det.html', item=item, user_id=session['user'])
+
+
+@ login_required
+@ app.route('/item/<int:item_id>/del', methods=['POST'])
+def item_del(item_id):
+    init_db()
+    item = db_session.get(Item, item_id)
+    if item and session.get('user') == item.owner:
+        db_session.delete(item)
+        db_session.commit()
+        return render_template("/"), 200
+    return jsonify({"error": "Non autorizzato o elemento non trovato"}), 403
+
+
 
 
 @app.route('/leasers', methods=['GET'])
@@ -221,7 +242,7 @@ def search():
         name = request.args.get('name')
         init_db()
         item = db_session.execute(select(Item).filter_by(name=name)).scalar()
-        return render_template('item_det.html', item=item)
+        return render_template('item_det.html', item=item, user_id=session['user'])
     if request.methods == 'POST':
         return 'POST'
 
