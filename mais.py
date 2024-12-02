@@ -100,8 +100,8 @@ def profile():
         session.pop('user', None)
         session.pop(login, None)
         return redirect('/login')
-    if session.get('user') is None:
-        return redirect('/login')
+        if session.get('user') is None:
+            return redirect('/login')
 
 
 @login_required
@@ -110,9 +110,12 @@ def fav():
     if request.method == 'GET':
         init_db()
         fav_id_item = db_session.execute(
-            select(Favorite).filter_by(user=session['user'])).scalars()
-        fav_it = db_session.execute(
-            select(Item).filter_by(id=fav_id_item)).scalars()
+            select(Favorite).filter_by(user=session['user']).where(Favorite.item == Item.id)).scalars()
+        print(int(fav_id_item))
+        for fav in fav_id_item:
+            id_item = fav
+            fav_it = db_session.execute(
+                select(Item).filter_by(id=id_item)).scalars()
 
         return render_template('favorite.html', fav=fav_it)
 
@@ -242,7 +245,7 @@ def search():
         name = request.args.get('name')
         init_db()
         item = db_session.execute(select(Item).filter_by(name=name)).scalar()
-        return render_template('item_det.html', item=item, user_id=session['user'])
+        return render_template('item_det.html', item=item)
     if request.methods == 'POST':
         return 'POST'
 
@@ -274,4 +277,4 @@ def compare():
 
 
 if __name__ == '__main__':
-    app.run(debug=True)  # Imposta debug=True per facilitare il debug
+    app.run(debug=True, host='0.0.0.0', port=8080)
