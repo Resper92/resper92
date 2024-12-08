@@ -7,16 +7,14 @@
 </head>
 <body>
     <H1>My favorite</H1>
-    {% if fav_it %}
+    {% for fav_it in fav %}
     <p><strong>Name:</strong> {{ fav_it.name }}</p>
     <p><strong>Description:</strong> {{ fav_it.description }}</p>
     <p><strong>Price per hour:</strong> {{ fav_it.price_hour }}</p>
     <p><strong>Price per day:</strong> {{ fav_it.price_day }}</p>
     <p><strong>Price per week:</strong> {{ fav_it.price_week }}</p>
     <p><strong>Price per month:</strong> {{ fav_it.price_month }}</p>
-    {% else %}
-    <p>Favorite item not found.</p>
-    {% endif %}
+    {% endfor %}
 
     
 </body>

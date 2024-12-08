@@ -1,0 +1,39 @@
+services:
+  web_app:
+    build: .
+    command: python mais.py
+    ports:
+      - "5000:5000"
+    environment:
+      - RABBIT_HOST=rabbit_host
+      - DB_HOST=db_host
+      - DB_USER=postgres
+      - DB_PASSWORD=example
+      - DB_NAME=postgres
+
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    ports:
+      - "15672:15672"
+      - "5672:5672"
+    hostname: rabbit_host
+
+  celery_worker:
+    build: .
+    command: 
+    environment:
+      - RABBIT_HOST=rabbit_host
+      - DB_HOST=db_host
+      - DB_USER=postgres
+      - DB_PASSWORD=example
+      - DB_NAME=postgres
+
+  db_postgres:
+    image: postgres
+    restart: always
+    environment:
+      - POSTGRES_PASSWORD=example
+    hostname: db_host
+    ports:
+      - 5432:5432

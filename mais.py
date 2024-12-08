@@ -4,6 +4,8 @@ from sqlalchemy import select, delete
 from functools import wraps
 from conectdb import init_db, db_session
 from model import User, Item, Contract, Favorite, Feedback, Search_history
+import celery_worker
+
 
 app = Flask(__name__, template_folder='templates')
 app.secret_key = 'asdasdasda12122'
@@ -82,6 +84,8 @@ def logout():
 @app.route('/profile', methods=['GET', 'PUT', 'PATCH', 'DELETE'])
 def profile():
     init_db()
+    if session.get('user') is None:
+        return redirect('/login')
     if request.method == 'GET':
         user_data = db_session.execute(
             select(User).filter_by(user_id=session['user'])).scalar()
@@ -100,8 +104,7 @@ def profile():
         session.pop('user', None)
         session.pop(login, None)
         return redirect('/login')
-        if session.get('user') is None:
-            return redirect('/login')
+
 
 
 @login_required
@@ -109,24 +112,23 @@ def profile():
 def fav():
     if request.method == 'GET':
         init_db()
-        fav_id_item = db_session.execute(
-            select(Favorite).filter_by(user=session['user']).where(Favorite.item == Item.id)).scalars()
-        print(int(fav_id_item))
-        for fav in fav_id_item:
-            id_item = fav
-            fav_it = db_session.execute(
-                select(Item).filter_by(id=id_item)).scalars()
+        fav_id_items = db_session.execute(
+            select(Favorite.item).filter_by(user=session['user'])).scalars().all()
+
+        fav_it = db_session.execute(
+            select(Item).filter(Item.id.in_(fav_id_items))).scalars().all()
 
         return render_template('favorite.html', fav=fav_it)
 
     if request.method == 'POST':
-        return 'POST'
-    if request.method == 'PUT':
-        return 'PUT'
-    if request.method == 'PATCH':
-        return 'PATCH'
-    if request.method == 'DELETE':
-        return 'DELETE'
+        init_db()
+        fav = Favorite(**request.form)
+        fav.user = session['user']
+        db_session.add(fav)
+        db_session.commit()
+
+        return render_template('favorite.html')
+
 
 
 @app.route('/profile/favourites/<favourite_id>', methods=['DELETE'])
@@ -174,6 +176,8 @@ def items():
 @ app.route('/item/<int:item_id>', methods=['GET', 'DELETE'])
 def item(item_id):
     if request.method == 'GET':
+        if session.get('user') is None:
+            return redirect('/login')
         init_db()
         item = db_session.execute(select(Item).filter_by(id=item_id)).scalar()
         return render_template('item_det.html', item=item, user_id=session['user'])
@@ -191,14 +195,12 @@ def item_del(item_id):
     return jsonify({"error": "Non autorizzato o elemento non trovato"}), 403
 
 
-
-
-@app.route('/leasers', methods=['GET'])
+@app.route('/leaser', methods=['GET'])
 def leasers():
     if request.method == 'GET':
         init_db()
         leasers = db_session.execute(select(User)).scalars()
-        return 'GET'
+        return render_template('leaser.html', leasers=leasers)
 
 
 @app.route('/leasers/<leasers_id>', methods=['GET'])
@@ -224,6 +226,7 @@ def contracts():
             contract.leaser = session['user']
             db_session.add(contract)
             db_session.commit()
+            celery_worker.send_email.delay(contract.id)
             return redirect('/')
 
 @app.route('/contract/<contracts_id>', methods=['GET', 'PATCH', 'PUT'])
@@ -276,5 +279,9 @@ def compare():
         return 'PUT'
 
 
+@app.route('/add_task', methods=['get'])
+def set_task():
+    celery_worker.add.delay()
+
 if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0', port=8080)
+    app.run(debug=True, host='0.0.0.0', port=5000)
