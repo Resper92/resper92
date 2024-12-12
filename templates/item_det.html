@@ -4,33 +4,97 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dettagli dell'Elemento</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            background-color: #f4f4f9;
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+        header {
+            background-color: #4CAF50;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        header h1 {
+            margin: 0;
+        }
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        .container p {
+            margin: 10px 0;
+        }
+        .container strong {
+            color: #4CAF50;
+        }
+        .actions {
+            margin-top: 20px;
+            text-align: center;
+        }
+        .actions a, .actions input[type="submit"] {
+            display: inline-block;
+            background-color: #4CAF50;
+            color: white;
+            text-decoration: none;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            margin: 5px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        .actions a:hover, .actions input[type="submit"]:hover {
+            background-color: #45a049;
+        }
+        .actions .btn-secondary {
+            background-color: #555;
+        }
+        .actions .btn-secondary:hover {
+            background-color: #666;
+        }
+    </style>
 </head>
 <body>
-    <h1>Dettagli dell'Elemento</h1>
+    <header>
+        <h1>Dettagli dell'Elemento</h1>
+    </header>
+    <div class="container">
+        <!-- Mostra i dettagli dell'elemento se presente -->
+        {% if item %}
+            <p><strong>Nome:</strong> {{ item.name }}</p>
+            <p><strong>Descrizione:</strong> {{ item.description }}</p>
+            <p><strong>Proprietario:</strong> {{ item.owner }}</p>
+            <p><strong>Prezzo per ora:</strong> ₴ {{ item.price_hour }}</p>
+            <p><strong>Prezzo per giorno:</strong> ₴ {{ item.price_day }}</p>
+            <p><strong>Prezzo per settimana:</strong> ₴ {{ item.price_week }}</p>
+            <p><strong>Prezzo per mese:</strong> ₴ {{ item.price_month }}</p>
+        {% else %}
+            <p>Elemento non trovato.</p>
+        {% endif %}
 
-    <!-- Mostra i dettagli dell'elemento se presente -->
-    {% if item %}
-        <p><strong>Nome:</strong> {{ item.name }}</p>
-        <p><strong>Descrizione:</strong> {{ item.description }}</p>
-        <p><strong>Proprietario:</strong> {{ item.owner }}</p>
-        <p><strong>Prezzo per ora:</strong> ₴ {{ item.price_hour }}</p>
-        <p><strong>Prezzo per giorno:</strong> ₴ {{ item.price_day }}</p>
-        <p><strong>Prezzo per settimana:</strong> ₴ {{ item.price_week }}</p>
-        <p><strong>Prezzo per mese:</strong> ₴ {{ item.price_month }}</p>
-    {% else %}
-        <p>Elemento non trovato.</p>
-    {% endif %}
+        <!-- Opzioni disponibili solo per il proprietario -->
+        {% if user_id == item.owner %}
+        <div class="actions">
+            <form action="/item/{{ item.id }}/del" method="post" style="display: inline;">
+                <input type="submit" value="Elimina Elemento">
+            </form>
+        </div>
+        {% endif %}
 
-    {% if user_id == item.owner %}
-    <form action="/item/{{ item.id }}/del" method="post">
-        <input type="submit" value="DELETE">
-    </form>
-    {% endif %}
-    <!-- Add Contract -->
-    <a href="/contract?item_id={{ item.id }}" class="btn btn-primary mt-4">Crea Contratto</a>
-
-    <a href="/" class="btn btn-secondary mt-4">Torna alla Home</a>
-
-
+        <!-- Azioni generali -->
+        <div class="actions">
+            <a href="/contract?item_id={{ item.id }}" class="btn btn-primary">Crea Contratto</a>
+            <a href="/" class="btn btn-secondary">Torna alla Home</a>
+        </div>
+    </div>
 </body>
 </html>

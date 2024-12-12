@@ -4,41 +4,120 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gestione Contratti</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            background-color: #f4f4f9;
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+        header {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            text-align: center;
+        }
+        h1, h2 {
+            color: #4CAF50;
+        }
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        .contract {
+            border-bottom: 1px solid #ddd;
+            padding: 10px 0;
+        }
+        .contract:last-child {
+            border-bottom: none;
+        }
+        ul {
+            list-style: none;
+            padding: 0;
+        }
+        ul li {
+            margin: 5px 0;
+        }
+        form {
+            margin-top: 20px;
+            padding: 20px;
+            background: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+        }
+        form input[type="text"],
+        form input[type="date"] {
+            width: calc(100% - 20px);
+            padding: 8px 10px;
+            margin: 8px 0;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        form input[type="submit"] {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+        form input[type="submit"]:hover {
+            background-color: #45a049;
+        }
+        .info {
+            font-size: 14px;
+            color: #555;
+        }
+    </style>
 </head>
 <body>
-    <h1>Contratti</h1>
-    <p>Numero di contratti: {{ contract|length }}</p>
+    <header>
+        <h1>Gestione Contratti</h1>
+    </header>
+    <div class="container">
+        <p class="info">Numero di contratti: {{ contracts|length }}</p>
 
-    <!-- Lista di tutti i contratti -->
-    {% for contract in contracts %}
-        <div>
+        <!-- Lista di tutti i contratti -->
+        {% for contract in contracts %}
+        <div class="contract">
             <h2>Contratto ID: {{ contract.id }}</h2>
             <ul>
-                <li>Testo: {{ contract.text }}</li>
-                <li>Data di Inizio: {{ contract.start_date }}</li>
-                <li>Data di Fine: {{ contract.end_date }}</li>
-                <li>Locatore: {{ contract.leaser }}</li>
-                <li>Conduttore: {{ contract.taker }}</li>
-                <li>Elemento: {{ contract.item }}</li>
+                <li><strong>Testo:</strong> {{ contract.text }}</li>
+                <li><strong>Data di Inizio:</strong> {{ contract.start_date }}</li>
+                <li><strong>Data di Fine:</strong> {{ contract.end_date }}</li>
+                <li><strong>Locatore:</strong> {{ contract.leaser }}</li>
+                <li><strong>Conduttore:</strong> {{ contract.taker }}</li>
+                <li><strong>Elemento:</strong> {{ contract.item }}</li>
             </ul>
-            <hr>
         </div>
-    {% endfor %}
+        {% endfor %}
 
-    <!-- Modulo per aggiungere un nuovo contratto -->
-    <form action="/contract" method="post">
-        <h3>Aggiungi un Nuovo Contratto</h3>
-        Testo: <br>
-        <input type="text" name="text" required><br>
-        Data di Inizio: <br>
-        <input type="date" name="start_date" required><br>
-        Data di Fine: <br>
-        <input type="date" name="end_date" required><br>
-        Conduttore: <br>
-        <input type="text" name="taker" required><br>
-        Elemento: <br>
-        <input type="text" name="item" required><br>
-        <input type="submit" value="Invia">
-    </form>
+        <!-- Modulo per aggiungere un nuovo contratto -->
+        <form action="/contract" method="post">
+            <h3>Aggiungi un Nuovo Contratto</h3>
+            <label for="text">Testo:</label>
+            <input type="text" id="text" name="text" required>
+
+            <label for="start_date">Data di Inizio:</label>
+            <input type="date" id="start_date" name="start_date" required>
+
+            <label for="end_date">Data di Fine:</label>
+            <input type="date" id="end_date" name="end_date" required>
+
+            <label for="taker">Conduttore:</label>
+            <input type="text" id="taker" name="taker" required>
+
+            <label for="item">Elemento:</label>
+            <input type="text" id="item" name="item" required>
+
+            <input type="submit" value="Invia">
+        </form>
+    </div>
 </body>
 </html>

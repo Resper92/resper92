@@ -4,23 +4,97 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Home</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            background-color: #f4f4f9;
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+        header {
+            background-color: #4CAF50;
+            color: white;
+            padding: 20px 0;
+            text-align: center;
+        }
+        header h1 {
+            margin: 0;
+        }
+        nav {
+            background: #333;
+            color: white;
+            padding: 10px;
+            text-align: center;
+        }
+        nav a {
+            color: white;
+            text-decoration: none;
+            margin: 0 10px;
+            font-weight: bold;
+        }
+        nav a:hover {
+            color: #4CAF50;
+        }
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        form {
+            margin-top: 20px;
+            text-align: center;
+        }
+        form label {
+            font-weight: bold;
+        }
+        form input[type="text"] {
+            width: calc(100% - 40px);
+            max-width: 400px;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        form button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+        form button:hover {
+            background-color: #45a049;
+        }
+    </style>
 </head>
 <body>
-    <h1> Home</h1>
+    <header>
+        <h1>Benvenuto nella Home</h1>
+    </header>
     <nav>
-        <a href="login">Login</a> | 
-        <a href="register">Registrati</a> | 
-        <a href="logout">Logout</a> |
-        <a href=" item"> Item</a> |
-        <a href="profile">Profile</a> |
+        {% if session.get('user') %}
+            <a href="/profile">Profilo</a> |
+            <a href="/logout">Logout</a> |
+        {% else %}
+            <a href="/login">Login</a> |
+            <a href="/register">Registrati</a> |
+        {% endif %}
+        <a href="/item">Articoli</a> |
+        <a href="/leaser">Tutti gli utenti</a>
     </nav>
-    <br>
-    <form action="/search" method="get">
-        <label for="name">Cerca un elemento per nome:</label>
-        <input type="text" id="name" name="name">
-        <button type="submit">Cerca</button>
-    </form>
-
-      
+    <div class="container">
+        <form action="/search" method="get">
+            <label for="name">Cerca un elemento per nome:</label><br>
+            <input type="text" id="name" name="name" placeholder="Inserisci il nome dell'elemento">
+            <button type="submit">Cerca</button>
+        </form>
+    </div>
 </body>
 </html>

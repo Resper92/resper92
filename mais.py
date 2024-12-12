@@ -54,6 +54,8 @@ def login():
         init_db()
         user_data = db_session.execute(select(User).filter_by(
             login=username)).scalar()
+        user_data = db_session.execute(
+            select(User).filter_by(password=password)).scalar()
         if user_data:
             session['user'] = user_data.user_id
             return redirect('/profile')
