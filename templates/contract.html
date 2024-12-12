@@ -26,7 +26,7 @@
     {% endfor %}
 
     <!-- Modulo per aggiungere un nuovo contratto -->
-    <form action="/contracts" method="post">
+    <form action="/contract" method="post">
         <h3>Aggiungi un Nuovo Contratto</h3>
         Testo: <br>
         <input type="text" name="text" required><br>
@@ -34,8 +34,6 @@
         <input type="date" name="start_date" required><br>
         Data di Fine: <br>
         <input type="date" name="end_date" required><br>
-        Locatore: <br>
-        <input type="text" name="leaser" required><br>
         Conduttore: <br>
         <input type="text" name="taker" required><br>
         Elemento: <br>

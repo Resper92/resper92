@@ -1,0 +1,44 @@
+[
+    {
+        "author": 1,
+        "contract": 1,
+        "grade": 5,
+        "id": 1,
+        "user": 2
+    },
+    {
+        "author": 1,
+        "contract": 2,
+        "grade": 5,
+        "id": 2,
+        "user": 2
+    },
+    {
+        "author": 1,
+        "contract": 2,
+        "grade": 5,
+        "id": 3,
+        "user": 2
+    },
+    {
+        "author": 1,
+        "contract": 2,
+        "grade": 5,
+        "id": 4,
+        "user": 2
+    },
+    {
+        "author": 1,
+        "contract": 2,
+        "grade": 5,
+        "id": 5,
+        "user": 2
+    },
+    {
+        "author": 1,
+        "contract": 1212,
+        "grade": 22,
+        "id": 6,
+        "user": 2
+    }
+]

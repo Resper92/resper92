@@ -4,8 +4,8 @@ from sqlalchemy import select, delete
 from functools import wraps
 from conectdb import init_db, db_session
 from model import User, Item, Contract, Favorite, Feedback, Search_history
-import celery_worker
 
+import celery_worker
 
 app = Flask(__name__, template_folder='templates')
 app.secret_key = 'asdasdasda12122'
@@ -24,18 +24,18 @@ def dict_factory(cursor, row):
         d[col[0]] = row[idx]
     return d
 
-class first_database():
-    def __init__(self, file_name):
-        self.con = sqlite3.connect(file_name)
-        self.con.row_factory = dict_factory
-        self.cur = self.con.cursor()
+# class first_database():
+#     def __init__(self, file_name):
+#         self.con = sqlite3.connect(file_name)
+#         self.con.row_factory = dict_factory
+#         self.cur = self.con.cursor()
 
-    def __enter__(self):
-        return self.cur
+#     def __enter__(self):
+#         return self.cur
 
-    def __exit__(self, type, value, traceback):
-        self.con.commit()
-        self.con.close()
+#     def __exit__(self, type, value, traceback):
+#         self.con.commit()
+#         self.con.close()
 
 
 
@@ -122,12 +122,13 @@ def fav():
 
     if request.method == 'POST':
         init_db()
-        fav = Favorite(**request.form)
-        fav.user = session['user']
+        item = request.form.get('item_id')
+        user = session.get('user')
+        fav = Favorite(user=user, item=item)
         db_session.add(fav)
         db_session.commit()
 
-        return render_template('favorite.html')
+        return redirect('/favorite')
 
 
 
@@ -216,25 +217,23 @@ def leaser(leasers_id):
 @app.route('/contract', methods=['GET', 'POST'])
 def contracts():
     if request.method == 'GET':
-        init_db()
-        contract = db_session.execute(select(Contract)).scalars()
-        return render_template('contract.html', contracts=contract)
+        contracts = Contract.query.all()
+        return render_template('contract.html', contracts=contracts)
+
     if request.method == 'POST':
-        if session.get('user') is None:
-            init_db()
-            contract = Contract(**request.form)
-            contract.leaser = session['user']
-            db_session.add(contract)
-            db_session.commit()
-            celery_worker.send_email.delay(contract.id)
-            return redirect('/')
+        contrac = Contract(**request.form)
+        contrac.leaser = session['user']
+        db_session.add(contrac)
+        db_session.commit()
+        celery_worker.send_email(contract)
+        return redirect('/')
 
 @app.route('/contract/<contracts_id>', methods=['GET', 'PATCH', 'PUT'])
 def contract(contracts_id):
     if request.methods == 'GET':
         init_db()
         contract = db_session.execute(
-            select(Contract).filter_by(contract_id=contracts_id)).scalar()
+            select(Contract).filter_by(contract=contracts_id)).scalar()
         return render_template('contract.html', contract=contract)
     if request.method == 'PATCH':
         return 'PATCH'

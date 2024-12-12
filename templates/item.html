@@ -118,11 +118,15 @@
                     <td>{{ item.price_month }} €</td>
                     <td>
                         <a href="/item/{{ item.id }}" class="btn btn-view">Vedi Dettagli</a>
+                        
+                        {% if session.user %}
                         <form action="/favorite" method="post" style="display: inline;">
                             <input type="hidden" name="item_id" value="{{ item.id }}">
                             <button type="submit" class="btn btn-add-fav">Aggiungi ai Preferiti</button>
                         </form>
+                        {% endif %}
                     </td>
+                    
                 </tr>
                 {% endfor %}
             </tbody>

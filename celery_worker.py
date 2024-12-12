@@ -1,27 +1,30 @@
 import os
-from sqlalchemy import select
-
+import smtplib
+from email.mime.text import MIMEText
 from celery import Celery
+from sqlalchemy import select
 from conectdb import init_db, db_session
 from model import Contract, Item
 
-
-app = Celery(
-    'task', broker=f'pyamqp://guest@{os.environ.get("RABBIT_HOST", "localhost")}//')
+# ... (configurazioni Celery)
 
 
-@app.task
-def send_email(contract_id):
-    init_db()
-    contract = db_session.execute(
-        select(Contract).filter_by(id=contract_id)).scalar()
-    item = db_session.execute(
-        select(Item).filter_by(id=contract.item)).scalar()
-    import smtplib
-    s = smtplib.SMTP('smtp.gmail.com', 587)
-    s.starttls()
-    s.login("t6q8p@example.com", "mais2023")
-    message = ("sdasdasdassd")
-    s.sendmail("t6q8p@example.com", "t6q8p@example.com", message)
-    s.sendmail("t6q8p@example.com", "t6q8p@example.com", message)
-    s.quit()
+@Celery.task
+def send_email(contract):
+    try:
+        init_db()
+        contrac = db_session.query(Contract).get(contract)
+        if contrac:
+            message = MIMEText('new contract')
+            message['From'] = os.environ.get('EMAIL_SENDER')  # (Consider secure storage)
+            message['To'] = os.environ.get('EMAIL_RECIPIENT')  # (Consider secure storage)
+            message['Subject'] = 'Nuovo contratto'
+
+            with smtplib.SMTP_SSL('smtp.gmail.com', 465) as smtp:
+                smtp.login(os.environ.get('EMAIL_USER'), os.environ.get('EMAIL_PASSWORD'))  # (Consider secure storage)
+                smtp.sendmail(message['From'], message['To'], message.as_string())
+        else:
+            print(f"Contract with ID {id} not found")
+    except Exception as e:
+        # Implement more specific error handling (e.g., smtplib.exceptions)
+        print(f"Errore durante l'invio dell'email: {str(e)}")

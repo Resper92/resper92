@@ -1,0 +1,68 @@
+[
+    {
+        "contacts": "+38097681958",
+        "email": null,
+        "full_name": "Bogdan Ignatenko",
+        "ipn": "114587789",
+        "login": "resper",
+        "passport": "115789547",
+        "password": "111111",
+        "photo": "https://neweralive.na/wp-content/uploads/2024/06/lloyd-sikeba.jpg",
+        "user_id": 1
+    },
+    {
+        "contacts": "+3806792814",
+        "email": null,
+        "full_name": "Ignatjuk Ivanovich",
+        "ipn": "11458789",
+        "login": "eganarot",
+        "passport": "551478975",
+        "password": "1458789",
+        "photo": "https://wac-cdn.atlassian.com/dam/jcr:ba03a215-2f45-40f5-8540-b2015223c918/Max-R_Headshot%20(1).jpg?cdnVersion=2391",
+        "user_id": 2
+    },
+    {
+        "contacts": "1212",
+        "email": null,
+        "full_name": "Roman Ivanovych",
+        "ipn": "12354785",
+        "login": "roman",
+        "passport": "hs121212",
+        "password": "123456",
+        "photo": "sdashd",
+        "user_id": 3
+    },
+    {
+        "contacts": "4545",
+        "email": null,
+        "full_name": "reers",
+        "ipn": "12345",
+        "login": "rasd",
+        "passport": "5sasds5a",
+        "password": "6654321",
+        "photo": "545sds",
+        "user_id": 4
+    },
+    {
+        "contacts": "4545",
+        "email": null,
+        "full_name": "reers",
+        "ipn": "12345",
+        "login": "rasds",
+        "passport": "1224ssaaa",
+        "password": "11222444",
+        "photo": "545sds",
+        "user_id": 5
+    },
+    {
+        "contacts": "1211",
+        "email": null,
+        "full_name": "sadasd",
+        "ipn": "12214",
+        "login": "resper121",
+        "passport": "sasd122",
+        "password": "1111",
+        "photo": "sda",
+        "user_id": 6
+    }
+]

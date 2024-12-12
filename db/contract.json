@@ -1,0 +1,12 @@
+[
+    {
+        "contract": 1,
+        "end_date": "15/03/2024",
+        "item": 2,
+        "leaser": 1,
+        "signet_datetime": "2024-11-20 22:51:22",
+        "start_date": "10/03/2024",
+        "taker": 2,
+        "text": "bla bla bla"
+    }
+]

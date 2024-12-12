@@ -87,7 +87,7 @@ class Feedback(Base):
 
 class Favorite(Base):
     __tablename__ = 'favorites'
-    id = Column(Integer, primary_key=True)
+    id = Column(Integer, primary_key=True, autoincrement=True)
     user = mapped_column(ForeignKey('user.user_id'))
     item = mapped_column(ForeignKey('item.id'))
 
