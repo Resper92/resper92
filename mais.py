@@ -4,11 +4,11 @@ from sqlalchemy import select, delete
 from functools import wraps
 from conectdb import init_db, db_session
 from model import User, Item, Contract, Favorite, Feedback, Search_history
-
 import celery_worker
 
 app = Flask(__name__, template_folder='templates')
 app.secret_key = 'asdasdasda12122'
+
 
 
 def login_required(f):
@@ -99,7 +99,7 @@ def profile():
       db_session.commit()
       return redirect('/profile')
     if request.method == 'DELETE':
-        user = db_session.execute(select(user).filter_by(
+        user = db_session.execute(select('user').filter_by(
             user_id=session['user'])).scalar()
         db_session.delete(user)
         db_session.commit()
@@ -223,19 +223,19 @@ def contracts():
         return render_template('contract.html', contracts=contracts)
 
     if request.method == 'POST':
-        contrac = Contract(**request.form)
-        contrac.leaser = session['user']
-        db_session.add(contrac)
+        contract = Contract(**request.form)
+        contract.leaser = session['user']
+        db_session.add(contract)
         db_session.commit()
-        celery_worker.send_email(contract)
+        celery_worker.send_email(Contract.contract)
         return redirect('/')
 
 @app.route('/contract/<contracts_id>', methods=['GET', 'PATCH', 'PUT'])
-def contract(contracts_id):
+def contract(contract):
     if request.methods == 'GET':
         init_db()
         contract = db_session.execute(
-            select(Contract).filter_by(contract=contracts_id)).scalar()
+            select(Contract).filter_by(contract=contract)).scalar()
         return render_template('contract.html', contract=contract)
     if request.method == 'PATCH':
         return 'PATCH'
@@ -251,6 +251,10 @@ def search():
         item = db_session.execute(select(Item).filter_by(name=name)).scalar()
         return render_template('item_det.html', item=item)
     if request.methods == 'POST':
+        search = Search_history(**request.form)
+        search.user = session['user']
+        db_session.add(search)
+        db_session.commit()
         return 'POST'
 
 
@@ -282,7 +286,8 @@ def compare():
 
 @app.route('/add_task', methods=['get'])
 def set_task():
-    celery_worker.add.delay()
+    celery_worker.add.delay(1, 2)
+    return 'task sent'
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000)

@@ -1,21 +1,37 @@
-/login [GET, POST]
-/register [GET, POST]
-/logout [GET ? POST ?? DELETE]
+  flask
 
-/profile (/user, /me) [GET, PUT(PATCH), DELETE]
-      ?  /favouties [GET, POST, DELETE, PATCH]
-      ??  /favouties/<favourite_id> [DELETE]
-      ?  /search_history [GET, DELETE]
+    if request.method == 'POST':
+        contract = Contract(**request.form)
+        contract.leaser = session['user']
+        db_session.add(contract)
+        db_session.commit()
+        celery_worker.send_email(contract)
+        return redirect('/')
 
-/items [GET, POST]
-/items/<item_id> [GET, DELETE]
-/leasers [GET]
-/leasers/<leaser_id> [GET]
+celery 
 
-/contracts [GET, POST]
-/contracts/<contract_id> [GET, PATCH/PUT]
+@app.task
+def send_email(contract):
+    init_db()
+    contract = db_session.execute(
+        select(Contract).filter_by(contract=contract)).scalar()
+    item = db_session.execute(
+        select(Item).filter_by(contrac=Contract.item)).scalar()
+    import smtplib
+    s = smtplib.SMTP('smtp.gmail.com', 587)
+    s.starttls()
+    s.quit()
 
-/search [GET, (POST)]
+sqlalchemy model
 
-/complain [POST]
-/compare [GET, PUT/PATCH]
+class Contract(Base):
+    __tablename__ = 'contract'
+    contract = Column(Integer, primary_key=True)
+    text = Column(String(200))
+    start_date = Column(String(50))
+    end_date = Column(String(50))
+    leaser = mapped_column(ForeignKey('user.user_id'))
+    taker = mapped_column(ForeignKey('user.user_id'))
+    item = mapped_column(ForeignKey('item.id'))
+    signet_datetime = Column(DateTime, nullable=True,
+                             server_default=func.now())

@@ -21,7 +21,7 @@ services:
 
   celery_worker:
     build: .
-    command: 
+    command: celery -A celery_worker worker --loglevel=INFO
     environment:
       - RABBIT_HOST=rabbit_host
       - DB_HOST=db_host
