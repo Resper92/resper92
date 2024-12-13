@@ -21,12 +21,16 @@
         <p>Elemento non trovato.</p>
     {% endif %}
 
-    <!-- Opzione per eliminare l'elemento -->
-    <form action="/item/{{ item.id }}" method="delete" onsubmit="return confirm('Sei sicuro di voler eliminare questo elemento?');">
-        <input type="hidden" name="_method" value="DELETE">
-        <button type="submit">Elimina</button>
+    {% if user_id == item.owner %}
+    <form action="/item/{{ item.id }}/del" method="post">
+        <input type="submit" value="DELETE">
     </form>
+    {% endif %}
+    <!-- Add Contract -->
+    <a href="/contract?item_id={{ item.id }}" class="btn btn-primary mt-4">Crea Contratto</a>
 
-    <a href="/">Torna alla Home</a>
+    <a href="/" class="btn btn-secondary mt-4">Torna alla Home</a>
+
+
 </body>
 </html>

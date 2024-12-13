@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>All Users</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        h1 {
+            text-align: center;
+            margin-top: 20px;
+            margin-bottom: 40px;
+            color: #343a40;
+        }
+        .user-card {
+            background-color: #ffffff;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        .user-card img {
+            max-width: 100%;
+            max-height: 150px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+        .user-card h2 {
+            font-size: 18px;
+            color: #007bff;
+            margin-bottom: 10px;
+        }
+        .user-card p {
+            margin: 5px 0;
+        }
+        .container {
+            max-width: 800px;
+            margin: auto;
+            padding: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>All Users</h1>
+        {% for leasers in leasers %}
+        <div class="user-card">           
+            {% if leasers.photo %}
+                <img src="{{ leasers.photo }}" alt="Photo of {{ leasers.name }}">
+            {% else %}
+                <p><em>No photo available</em></p>
+            {% endif %}
+            <p><strong>Name:</strong> {{ leasers.full_name }}</strong></p>
+            <p><strong>Passport:</strong> {{ leasers.passport }}</p>
+            <p><strong>Contacts:</strong> {{ leasers.contacts }}</p>
+
+            <p><strong>Email:</strong> {{ leasers.email }}</p>
+        </div>
+        {% endfor %}
+    </div>
+</body>
+</html>
