@@ -217,7 +217,7 @@ def leaser(leasers_id):
 
 @login_required
 @app.route('/contract', methods=['GET', 'POST'])
-def contracts():
+def contract():
     if request.method == 'GET':
         contracts = Contract.query.all()
         return render_template('contract.html', contracts=contracts)
