@@ -48,19 +48,21 @@ def hello_world():
 def login():
     if request.method == 'GET':
         return render_template('login.html')
+
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
+
         init_db()
-        user_data = db_session.execute(select(User).filter_by(
-            login=username)).scalar()
         user_data = db_session.execute(
-            select(User).filter_by(password=password)).scalar()
+            select(User).filter_by(login=username, password=password)
+        ).scalar()
         if user_data:
             session['user'] = user_data.user_id
             return redirect('/profile')
         else:
             return render_template('login.html', error='Invalid username or password')
+
 
 
 
@@ -219,10 +221,18 @@ def leaser(leasers_id):
 @app.route('/contract', methods=['GET', 'POST'])
 def contract():
     if request.method == 'GET':
-        contracts = Contract.query.all()
-        return render_template('contract.html', contracts=contracts)
+        init_db()
+        contracts = db_session.execute(select(Contract)).scalars().all()
+        leas = db_session.execute(select(User).filter_by(
+            user_id=Contract.leaser)).scalar()
+        take = db_session.execute(select(User).filter_by(
+            user_id=Contract.taker)).scalar()
+        it = db_session.execute(select(Item).filter_by(
+            id=Contract.item)).scalar()
+        return render_template('contract.html', contracts=contracts, leas=leas, take=take, it=it)
 
     if request.method == 'POST':
+
         contract = Contract(**request.form)
         contract.leaser = session['user']
         db_session.add(contract)
@@ -230,13 +240,26 @@ def contract():
         celery_worker.send_email(Contract.contract)
         return redirect('/')
 
-@app.route('/contract/<contracts_id>', methods=['GET', 'PATCH', 'PUT'])
-def contract(contract):
-    if request.methods == 'GET':
+
+@login_required
+@app.route('/contract/<int:contract>', methods=['GET', 'PATCH', 'PUT'])
+def view_contract(contract):
+    if request.method == 'GET':
         init_db()
+        if session.get('user') is None:
+            return redirect('/login')
         contract = db_session.execute(
             select(Contract).filter_by(contract=contract)).scalar()
-        return render_template('contract.html', contract=contract)
+        name = db_session.execute(select(User).filter_by(
+            user_id=contract.leaser)).scalar()
+        name_2 = db_session.execute(select(User).filter_by(
+            user_id=contract.taker)).scalar()
+        item = db_session.execute(select(Item).filter_by(
+            id=contract.item)).scalar()
+        print(f"User ID: {session['user']}")
+        print(f"Contract Leaser ID: {contract.leaser}")
+        print(f"Contract Taker ID: {contract.taker}")
+        return render_template('contract_det.html', contract=contract, name=name, name_2=name_2, item=item)
     if request.method == 'PATCH':
         return 'PATCH'
     if request.method == 'PUT':

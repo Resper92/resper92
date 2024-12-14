@@ -4,27 +4,82 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Registrazione</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 500px;
+            margin: 50px auto;
+            padding: 20px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #4CAF50;
+        }
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        label {
+            font-weight: bold;
+        }
+        input[type="text"],
+        input[type="password"] {
+            width: calc(100% - 20px);
+            padding: 8px 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        input[type="submit"] {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        input[type="submit"]:hover {
+            background-color: #45a049;
+        }
+    </style>
 </head>
 <body>
-    <h1>Registrazione</h1>
-    <form action="/register" method="post">
-        Login: <br>
-        <input type="text" name="login"><br>
-        Password:<br>
-        <input type="password" name="password"><br>
-        Ipn: <br>
-        <input type="text" name="ipn"><br>
-        Your full name: <br>
-        <input type="text" name="full_name"><br>
-        Contacts:<br>
-        <input type="text" name="contacts"><br>
-        Link for your photo: <br>
-        <input type="text" name="photo"><br>
-        Passport: <br>
-        <input type="text" name="passport"><br>
+    <div class="container">
+        <h1>Registrazione</h1>
+        <form action="/register" method="post">
+            <label for="login">Login:</label>
+            <input type="text" id="login" name="login" required>
 
-        <input type="submit" value="send">
-    </form>
-    
+            <label for="password">Password:</label>
+            <input type="password" id="password" name="password" required>
+
+            <label for="ipn">IPN:</label>
+            <input type="text" id="ipn" name="ipn" required>
+
+            <label for="full_name">Nome Completo:</label>
+            <input type="text" id="full_name" name="full_name" required>
+
+            <label for="contacts">Contatti:</label>
+            <input type="text" id="contacts" name="contacts" required>
+
+            <label for="photo">Link Foto:</label>
+            <input type="text" id="photo" name="photo">
+
+            <label for="passport">Passaporto:</label>
+            <input type="text" id="passport" name="passport">
+
+            <input type="submit" value="Registrati">
+        </form>
+    </div>
 </body>
 </html>
