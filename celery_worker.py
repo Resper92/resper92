@@ -7,7 +7,7 @@ from conectdb import init_db, db_session
 from model import Contract, Item
 
 
-app = Celery('tasks', broker='pyamqp://guest@localhost//')
+app = Celery('tasks', broker='pyamqp://{os.getenv("RABBITMQ_USER")}:{os.getenv("RABBITMQ_PASS")}@localhost//')
 
 
 @app.task

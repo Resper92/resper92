@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dettagli Preferito</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+        .container {
+            max-width: 600px;
+            margin: auto;
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #007bff;
+        }
+        .details {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background-color: #f1f1f1;
+        }
+        .details p {
+            font-size: 16px;
+            margin: 5px 0;
+        }
+        .btn-delete {
+            background-color: #e74c3c;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            font-size: 16px;
+            width: 100%;
+        }
+        .btn-delete:hover {
+            background-color: #c0392b;
+        }
+        a.btn-back {
+            text-decoration: none;
+            display: inline-block;
+            margin-top: 15px;
+            text-align: center;
+            width: 100%;
+            background-color: #6c757d;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+        a.btn-back:hover {
+            background-color: #5a6268;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Dettagli Preferito</h1>
+
+        {% if fav %}
+        <div class="details">
+            <p><strong>ID Preferito:</strong> {{ fav.id }}</p>
+            <p><strong>Nome:</strong> {{ fav.name }}</p>
+            <p><strong>Descrizione:</strong> {{ fav.description }}</p>
+            <p><strong>Prezzo Ora:</strong> {{ fav.price_hour }} €</p>
+            <p><strong>Prezzo Giorno:</strong> {{ fav.price_day }} €</p>
+            <p><strong>Prezzo Settimana:</strong> {{ fav.price_week }} €</p>
+            <p><strong>Prezzo Mese:</strong> {{ fav.price_month }} €</p>
+        </div>
+
+        <form action="/favourites/{{ fav.id }}" method="post" onsubmit="return confirm('Sei sicuro di voler eliminare questo preferito?');">
+            <input type="hidden" name="_method" value="DELETE">
+            <button type="submit" class="btn-delete">Elimina Preferito</button>
+        </form>
+        {% else %}
+        <div class="alert alert-danger" role="alert">
+            Il preferito selezionato non esiste o non è stato trovato.
+        </div>
+        {% endif %}
+
+        <a href="/favorite" class="btn-back">Torna ai Preferiti</a>
+    </div>
+</body>
+</html>

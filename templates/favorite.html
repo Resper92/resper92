@@ -4,6 +4,82 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My favorite</title>
+    <style>
+        /* Stile generico */
+        body {
+            background-color: #f8f9fa;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        h1 {
+            text-align: center;
+            margin: 20px 0;
+            color: #343a40;
+        }
+        .container {
+            max-width: 1200px;
+            margin: auto;
+            padding: 20px;
+        }
+
+        /* Stile della tabella */
+        .table {
+            width: 100%;
+            margin-top: 20px;
+            border-collapse: collapse;
+            background-color: #ffffff;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        .table th, .table td {
+            text-align: left;
+            padding: 15px;
+            border-bottom: 1px solid #dee2e6;
+        }
+        .table th {
+            background-color: #007bff;
+            color: white;
+            font-weight: bold;
+        }
+        .table tbody tr:hover {
+            background-color: #f1f1f1;
+        }
+
+        /* Stile per le immagini */
+        .item-photo {
+            max-width: 80px;
+            border-radius: 8px;
+            object-fit: cover;
+        }
+
+        /* Pulsanti */
+        .btn {
+            display: inline-block;
+            padding: 8px 12px;
+            font-size: 14px;
+            border-radius: 5px;
+            text-decoration: none;
+            text-align: center;
+        }
+        .btn-add-fav {
+            background-color: #28a745;
+            color: white;
+            border: none;
+        }
+        .btn-add-fav:hover {
+            background-color: #218838;
+        }
+        .btn-view {
+            background-color: #007bff;
+            color: white;
+            border: none;
+        }
+        .btn-view:hover {
+            background-color: #0056b3;
+        }
+    </style>
 </head>
 <body>
     <H1>My favorite</H1>
@@ -14,8 +90,9 @@
     <p><strong>Price per day:</strong> {{ fav_it.price_day }}</p>
     <p><strong>Price per week:</strong> {{ fav_it.price_week }}</p>
     <p><strong>Price per month:</strong> {{ fav_it.price_month }}</p>
+    <p> <a href="/favorite/{{ fav_it.id }}" class="btn btn-view">Vedi Dettagli</a>  </p>
     {% endfor %}
-
+    
     
 </body>
 </html>

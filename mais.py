@@ -1,6 +1,6 @@
 from flask import Flask, render_template, request, redirect, session, jsonify
 import sqlite3
-from sqlalchemy import select, delete
+from sqlalchemy import select, delete, update
 from functools import wraps
 from conectdb import init_db, db_session
 from model import User, Item, Contract, Favorite, Feedback, Search_history
@@ -95,10 +95,10 @@ def profile():
             select(User).filter_by(user_id=session['user'])).scalar()
         return render_template('profile.html', user=user_data)
     if request.method == 'PUT':
-      user = db_session.execute(select(user).filter_by(
-          user_id=session['user'])).scalar()
-      user.full_name = request.form['full_name']
+      init_db()
+      user=db_session.execute(update(User).filter_by(user = session['user']).values(**request.form))
       db_session.commit()
+      db_session.close()
       return redirect('/profile')
     if request.method == 'DELETE':
         user = db_session.execute(select('user').filter_by(
@@ -112,7 +112,7 @@ def profile():
 
 
 @login_required
-@app.route('/favorite', methods=['GET', 'POST', 'PATCH', 'DELETE'])
+@app.route('/favorite', methods=['GET', 'POST', 'DELETE'])
 def fav():
     if request.method == 'GET':
         init_db()
@@ -135,10 +135,18 @@ def fav():
         return redirect('/favorite')
 
 
+@app.route('/favorite/<int:fav_id>', methods=['GET', 'DELETE'])
+def del_fav(fav_id):
+    if request.method == 'GET':
+        init_db()
+        fav = db_session.execute(select(Favorite).filter_by(id=fav_id)).scalar()
+        return render_template('favorit_id.html', fav=fav)
 
-@app.route('/profile/favourites/<favourite_id>', methods=['DELETE'])
-def del_fav(favourite_id):
     if request.method == 'DELETE':
+        init_db()
+        fav = db_session.execute(select(Favorite).filter_by(id)).scalar()
+        db_session.delete(fav)
+        db_session.commit()
         return 'DELETE'
 
 
@@ -242,7 +250,7 @@ def contract():
 
 
 @login_required
-@app.route('/contract/<int:contract>', methods=['GET', 'PATCH', 'PUT'])
+@app.route('/contract/<int:contract>', methods=['GET'])
 def view_contract(contract):
     if request.method == 'GET':
         init_db()
@@ -256,14 +264,7 @@ def view_contract(contract):
             user_id=contract.taker)).scalar()
         item = db_session.execute(select(Item).filter_by(
             id=contract.item)).scalar()
-        print(f"User ID: {session['user']}")
-        print(f"Contract Leaser ID: {contract.leaser}")
-        print(f"Contract Taker ID: {contract.taker}")
         return render_template('contract_det.html', contract=contract, name=name, name_2=name_2, item=item)
-    if request.method == 'PATCH':
-        return 'PATCH'
-    if request.method == 'PUT':
-        return 'PUT'
 
 
 @app.route('/search', methods=['GET', 'POST'])
@@ -291,7 +292,7 @@ def complain():
         return redirect('/')
 
 
-@app.route('/compare', methods=['GET', 'PUT', 'PATCH'])
+@app.route('/compare', methods=['GET'])
 def compare():
     if request.method == 'GET':
         init_db()
@@ -301,10 +302,6 @@ def compare():
             name=request.args.get('name2'))).scalar()
         return render_template('compare.html', item=name1, item2=name2)
 
-    if request.method == 'PATCH':
-        return 'PATCH'
-    if request.method == 'PUT':
-        return 'PUT'
 
 
 @app.route('/add_task', methods=['get'])
